@@ -1,0 +1,154 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Modifier l'offre - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ==== STYLE OFFRE MODIFIER ==== */
+.job-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f4f8;
+    padding: 60px 20px;
+}
+
+.job-card {
+    width: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    padding: 40px 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    animation: fadeInUp .7s ease;
+    position: relative;
+}
+
+.job-card h2 {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #0d3b66;
+    margin-bottom: 25px;
+}
+
+.job-card input,
+.job-card select,
+.job-card textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e8ea;
+    margin-bottom: 15px;
+    background: #fafafa;
+    font-size: 0.95rem;
+}
+
+.btn-publish {
+    padding: 14px 40px;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 40px;
+    display: block;
+    margin: 20px auto 0;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.btn-publish:hover {
+    transform: translateY(-3px);
+    opacity: .95;
+}
+
+.alert {
+    padding: 12px 18px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+.alert-success { background: #d4edda; color: #155724; }
+.alert-error { background: #f8d7da; color: #721c24; }
+</style>
+
+<div class="job-wrapper">
+    <div class="job-card">
+
+        <h2>Modifier l'offre : {{ offer.title }}</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- Titre -->
+            <input type="text" name="title" placeholder="Titre de l'offre" value="{{ form.title.value }}" required>
+            {{ form.title.errors }}
+
+            <!-- Description -->
+            <textarea name="description" rows="5" placeholder="Description détaillée" required>{{ form.description.value }}</textarea>
+            {{ form.description.errors }}
+
+            <!-- Catégorie -->
+            <select name="category" required>
+                <option value="">Sélectionnez une catégorie</option>
+                <option value="design" {% if form.category.value == 'design' %}selected{% endif %}>Design Graphique</option>
+                <option value="dev" {% if form.category.value == 'dev' %}selected{% endif %}>Développement Web</option>
+                <option value="mobile" {% if form.category.value == 'mobile' %}selected{% endif %}>Développement Mobile</option>
+                <option value="uiux" {% if form.category.value == 'uiux' %}selected{% endif %}>UI/UX Design</option>
+                <option value="video" {% if form.category.value == 'video' %}selected{% endif %}>Montage / Motion Design</option>
+            </select>
+            {{ form.category.errors }}
+
+            <!-- Profil requis -->
+            <select name="required_profile" required>
+                <option value="">Profil recherché</option>
+                <option value="designer" {% if form.required_profile.value == 'designer' %}selected{% endif %}>Designer</option>
+                <option value="developpeur" {% if form.required_profile.value == 'developpeur' %}selected{% endif %}>Développeur</option>
+                <option value="mobile" {% if form.required_profile.value == 'mobile' %}selected{% endif %}>Développeur Mobile</option>
+                <option value="uiux" {% if form.required_profile.value == 'uiux' %}selected{% endif %}>UI/UX Designer</option>
+                <option value="video" {% if form.required_profile.value == 'video' %}selected{% endif %}>Motion Designer</option>
+            </select>
+            {{ form.required_profile.errors }}
+
+            <!-- Localisation / Type de prestation -->
+            <select name="location" required>
+                <option value="">Type de prestation</option>
+                <option value="En ligne" {% if form.location.value == 'En ligne' %}selected{% endif %}>En ligne</option>
+                <option value="Présentiel" {% if form.location.value == 'Présentiel' %}selected{% endif %}>Présentiel</option>
+            </select>
+            {{ form.location.errors }}
+
+            <!-- Prix à négocier -->
+            <p style="font-weight: 600; color: #ff6600;">Prix : <strong>À négocier</strong></p>
+            <small style="color: #666;">Le prix sera discuté directement avec le prestataire.</small>
+
+            <!-- Deadline -->
+            <input type="date" name="deadline" value="{{ form.deadline.value }}">
+            {{ form.deadline.errors }}
+
+            <!-- Fichier -->
+            <input type="file" name="file">
+            {% if offer.file %}
+            <p style="font-size:0.85rem; color:#555;">Fichier actuel : <a href="{{ offer.file.url }}" target="_blank">{{ offer.file.name }}</a></p>
+            {% endif %}
+            {{ form.file.errors }}
+
+            <!-- Bouton de publication -->
+            <button type="submit" class="btn-publish">Enregistrer les modifications</button>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

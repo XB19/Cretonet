@@ -1,0 +1,159 @@
+{% load static %}
+
+<nav class="navigation">
+  <div class="nav-container">
+    <!-- Logo -->
+    <a href="{% url 'home' %}" class="nav-logo">
+      <img src="{% static 'frontend/images/images/logo cretonet .png' %}" alt="CreToNet Logo" class="logo-img">
+    </a>
+
+    <!-- Liens principaux -->
+    <div class="nav-links">
+      <a href="{% url 'home' %}" class="nav-item {% if request.path == '/' %}active{% endif %}">Accueil</a>
+      <a href="{% url 'prestataires_list' %}" class="nav-item {% if request.path == '/prestataires/' %}active{% endif %}">Prestataires</a>
+      <a href="{% url 'offers_list' %}" class="nav-item {% if request.path == '/offres/' %}active{% endif %}">Offres</a>
+    </div>
+
+    <!-- Actions dynamiques -->
+    <div class="nav-actions">
+      {% if request.user.is_authenticated %}
+
+        {% if request.user.role == 'recruteur' %}
+          <a href="{% url 'prestataires_list' %}" class="btn-login">Trouver un prestataire</a>
+          <a href="{% url 'publish_offer' %}" class="btn-register">Publier une offre</a>
+        {% elif request.user.role == 'designer' %}
+          <a href="{% url 'offers_list' %}" class="btn-login">Trouver une offre</a>
+          <a href="{% url 'add_project' %}" class="btn-register">Publier un projet</a>
+        {% endif %}
+
+        <!-- 🔥 PROFIL utilisateur connecté (corrigé) -->
+        <a href="{% url 'mon_profil' %}" class="nav-icon">
+          {% if request.user.photo_profil %}
+            <img src="{{ request.user.photo_profil.url }}" alt="{{ request.user.username }}">
+          {% else %}
+            <img src="{% static 'frontend/icons/user-icon.png' %}" alt="Profil">
+          {% endif %}
+        </a>
+
+        <!-- Icône messagerie avec badge -->
+<!-- Icône messagerie avec badge -->
+<div class="nav-icon" style="position:relative;">
+  <a href="{% url 'messagerie' %}">
+    <img src="{% static 'frontend/icons/message-icon.png' %}" alt="Messages">
+    {% if messages_non_lus > 0 %}
+      <span style="
+        position:absolute;
+        top:-5px;
+        right:-5px;
+        background:red;
+        color:white;
+        font-size:10px;
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+      ">
+        {{ messages_non_lus }}
+      </span>
+    {% endif %}
+  </a>
+
+  {% if utilisateurs_non_lus %}
+    <div style="
+        position:absolute;
+        top:35px;
+        right:0;
+        background:#fff;
+        border:1px solid #ccc;
+        border-radius:8px;
+        width:200px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.1);
+        z-index:100;
+    ">
+      {% for u in utilisateurs_non_lus %}
+        <a href="{% url 'messagerie' u.expediteur__id_utilisateur %}" style="display:flex; align-items:center; padding:5px; text-decoration:none; color:#000;">
+          {% if u.expediteur__photo_profil %}
+            <img src="{{ u.expediteur__photo_profil.url }}" style="width:24px; height:24px; border-radius:50%; margin-right:8px;">
+          {% else %}
+            <img src="{% static 'frontend/icons/user-icon.png' %}" style="width:24px; height:24px; border-radius:50%; margin-right:8px;">
+          {% endif %}
+          <span>{{ u.expediteur__username }} ({{ u.nb_messages }})</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+
+
+        <!-- Bouton déconnexion -->
+        <a href="{% url 'deconnexion' %}" class="btn-logout">Déconnexion</a>
+
+      {% else %}
+        <a href="{% url 'connexion' %}" class="btn-login">Connexion</a>
+        <a href="{% url 'choisir_role' %}" class="btn-register">Inscription</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<style>
+/* Styles des boutons pour cohérence avec Connexion/Inscription */
+.btn-login, .btn-register, .btn-logout {
+  padding: 8px 16px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-login {
+  background: #ff6600;
+  color: #fff;
+}
+.btn-login:hover {
+  background: #e55a00;
+  box-shadow: 0 5px 15px rgba(229,90,0,0.4);
+}
+
+.btn-register {
+  background: #fff;
+  color: #ff6600;
+  border: 2px solid #ff6600;
+}
+.btn-register:hover {
+  background: #ff6600;
+  color: #fff;
+}
+
+.btn-logout {
+  background: #f81100;
+  color: #fff;
+}
+.btn-logout:hover {
+  background: #d32f2f;
+  box-shadow: 0 5px 15px rgba(211,47,47,0.4);
+}
+
+/* Icônes profil/messagerie */
+.nav-icon img {
+  width: 32px;
+  height: 32px;
+  margin-left: 12px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+.nav-icon img:hover {
+  transform: scale(1.1);
+}
+
+/* Logo */
+.logo-img {
+  height: 40px;   /* Augmente ici (ex: 45px, 50px, 60px) */
+  width: auto;
+  transition: all 0.3s ease;
+}
+</style>

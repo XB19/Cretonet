@@ -1,0 +1,73 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Offres{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title"> Offres</h1>
+
+<div class="table-wrapper">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Propriétaire</th>
+                <th>Catégorie</th>
+                <th>Statut</th>
+                <th>Mode de travail</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for offer in offers %}
+            <tr>
+                <td>{{ forloop.counter0|add:offers.start_index }}</td>
+                <td>{{ offer.title }}</td>
+                <td>{{ offer.owner.username }}</td>
+                <td>{{ offer.get_category_display }}</td>
+                <td>{{ offer.get_status_display }}</td>
+                <td>{{ offer.get_work_mode_display }}</td>
+                <td>{{ offer.created_at|date:"d/m/Y" }}</td>
+                <td class="table-actions">
+                    <a href="{% url 'admin_offer_detail' offer.pk %}" class="btn-action view">Voir</a>
+                    <a href="{% url 'admin_offer_delete' offer.pk %}" class="btn-action delete"
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="empty-table">Aucune offre trouvée.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if offers.has_previous %}
+        <a href="?page={{ offers.previous_page_number }}" class="page-link">
+            &laquo; Précédent
+        </a>
+    {% endif %}
+
+    {% for num in offers.paginator.page_range %}
+        {% if num == offers.number %}
+            <span class="page-link current">{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if offers.has_next %}
+        <a href="?page={{ offers.next_page_number }}" class="page-link">
+            Suivant &raquo;
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

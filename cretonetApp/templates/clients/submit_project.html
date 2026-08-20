@@ -1,0 +1,27 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Soumission de projet - CreToNet{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <h2 class="text-center mb-4">Soumettre votre projet</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.as_p }}
+
+        <h5>Images du projet</h5>
+        {{ formset.management_form }}
+        {% for f in formset %}
+            {{ f.as_p }}
+        {% endfor %}
+
+        <div class="d-flex gap-3 mt-3 justify-content-center">
+            <button type="submit" name="action" value="draft" class="btn btn-secondary">Enregistrer comme brouillon</button>
+            <button type="submit" name="action" value="publish" class="btn btn-primary">Publier le projet</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

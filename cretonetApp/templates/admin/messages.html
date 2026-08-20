@@ -1,0 +1,767 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Messages – Admin CreToNet
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================
+FILTER BAR (ADMIN TOOLS)
+========================================= */
+
+.messages-tools{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+padding:18px;
+background:#fff;
+border-bottom:1px solid var(--cto-border);
+}
+
+.messages-search{
+display:flex;
+align-items:center;
+gap:10px;
+flex:1;
+max-width:420px;
+background:#f8fafc;
+padding:10px 14px;
+border-radius:12px;
+border:1px solid var(--cto-border);
+}
+
+.messages-search i{
+color:var(--cto-text-light);
+}
+
+.messages-search input{
+border:none;
+outline:none;
+background:transparent;
+width:100%;
+font-size:14px;
+color:var(--cto-text);
+}
+
+.messages-filters{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.filter-btn{
+padding:8px 14px;
+border-radius:999px;
+font-size:13px;
+font-weight:600;
+text-decoration:none;
+border:1px solid var(--cto-border);
+color:var(--cto-text);
+background:#fff;
+transition:0.2s ease;
+}
+
+.filter-btn:hover{
+background:var(--cto-orange-light);
+color:var(--cto-orange);
+border-color:transparent;
+}
+
+.filter-btn.active{
+background:var(--cto-orange);
+color:#fff;
+border-color:var(--cto-orange);
+}
+
+
+/* =========================================
+MESSAGES PAGE
+========================================= */
+
+.messages-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* =========================================
+HEADER
+========================================= */
+
+.messages-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.messages-header-left{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.messages-title{
+font-size:30px;
+font-weight:700;
+color:var(--cto-text);
+line-height:1.2;
+}
+
+.messages-subtitle{
+font-size:15px;
+color:var(--cto-text-light);
+line-height:1.7;
+max-width:680px;
+}
+
+/* =========================================
+STAT CARD
+========================================= */
+
+.messages-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
+
+.message-stat-card{
+background:var(--cto-white);
+padding:24px;
+border-radius:20px;
+box-shadow:var(--cto-shadow);
+position:relative;
+overflow:hidden;
+transition:0.25s ease;
+}
+
+.message-stat-card:hover{
+transform:translateY(-4px);
+}
+
+.message-stat-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,var(--cto-orange),#ffb067);
+}
+
+.message-stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.message-stat-label{
+font-size:14px;
+font-weight:600;
+color:var(--cto-text-light);
+}
+
+.message-stat-icon{
+width:52px;
+height:52px;
+border-radius:14px;
+background:var(--cto-orange-light);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:var(--cto-orange);
+}
+
+.message-stat-number{
+font-size:34px;
+font-weight:700;
+color:var(--cto-text);
+}
+
+/* =========================================
+BOX
+========================================= */
+
+.messages-box{
+background:var(--cto-white);
+border-radius:22px;
+box-shadow:var(--cto-shadow);
+overflow:hidden;
+}
+
+.messages-box-header{
+padding:24px;
+border-bottom:1px solid var(--cto-border);
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.messages-box-header h3{
+font-size:18px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:10px;
+color:var(--cto-text);
+}
+
+.messages-box-header h3 i{
+color:var(--cto-orange);
+}
+
+/* =========================================
+BADGE
+========================================= */
+
+.admin-badge{
+padding:8px 14px;
+border-radius:999px;
+font-size:13px;
+font-weight:600;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.admin-badge.blue{
+background:#dbeafe;
+color:#2563eb;
+}
+
+/* =========================================
+MESSAGES LIST
+========================================= */
+
+.messages-admin-list{
+display:flex;
+flex-direction:column;
+}
+
+.message-admin-card{
+padding:24px;
+border-bottom:1px solid var(--cto-border);
+transition:0.2s ease;
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.message-admin-card:last-child{
+border-bottom:none;
+}
+
+.message-admin-card:hover{
+background:#fafafa;
+}
+
+/* =========================================
+MESSAGE TOP
+========================================= */
+
+.message-admin-top{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.message-user-info{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.message-avatar{
+width:52px;
+height:52px;
+border-radius:50%;
+background:var(--cto-orange-light);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:16px;
+font-weight:700;
+color:var(--cto-orange);
+flex-shrink:0;
+}
+
+.message-user-text{
+display:flex;
+flex-direction:column;
+gap:5px;
+}
+
+.message-user-text h4{
+font-size:15px;
+font-weight:600;
+color:var(--cto-text);
+}
+
+.message-user-text span{
+font-size:13px;
+color:var(--cto-text-light);
+}
+
+.message-date{
+font-size:13px;
+color:var(--cto-text-light);
+background:#f8fafc;
+padding:8px 14px;
+border-radius:999px;
+}
+
+/* =========================================
+MESSAGE CONTENT
+========================================= */
+
+.message-content{
+font-size:14px;
+line-height:1.8;
+color:#4b5563;
+padding-left:66px;
+}
+
+/* =========================================
+ACTIONS
+========================================= */
+
+.message-actions{
+display:flex;
+align-items:center;
+gap:12px;
+padding-left:66px;
+}
+
+.message-btn{
+height:40px;
+padding:0 18px;
+border:none;
+border-radius:10px;
+font-size:13px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:8px;
+cursor:pointer;
+transition:0.2s ease;
+text-decoration:none;
+}
+
+.message-btn.view{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.message-btn.delete{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.message-btn:hover{
+transform:translateY(-2px);
+}
+
+/* =========================================
+PAGINATION
+========================================= */
+
+.pagination-wrapper{
+padding:28px;
+display:flex;
+justify-content:center;
+border-top:1px solid var(--cto-border);
+background:#fff;
+}
+
+.pagination{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.pagination-btn,
+.pagination-number{
+width:42px;
+height:42px;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+text-decoration:none;
+font-size:14px;
+font-weight:600;
+transition:0.2s ease;
+border:1px solid var(--cto-border);
+background:#fff;
+color:var(--cto-text);
+}
+
+.pagination-btn:hover,
+.pagination-number:hover{
+background:var(--cto-orange-light);
+color:var(--cto-orange);
+border-color:transparent;
+transform:translateY(-2px);
+}
+
+.pagination-number.active{
+background:var(--cto-orange);
+color:#fff;
+border-color:var(--cto-orange);
+box-shadow:0 8px 18px rgba(255,107,53,0.22);
+}
+
+.pagination-btn.disabled{
+opacity:0.4;
+pointer-events:none;
+}
+
+/* =========================================
+EMPTY STATE
+========================================= */
+
+.empty-admin-state{
+padding:70px 25px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+.empty-admin-state i{
+font-size:60px;
+margin-bottom:20px;
+color:var(--cto-orange);
+opacity:0.85;
+}
+
+.empty-admin-state h3{
+font-size:22px;
+margin-bottom:10px;
+color:var(--cto-text);
+}
+
+.empty-admin-state p{
+font-size:15px;
+color:var(--cto-text-light);
+max-width:500px;
+line-height:1.7;
+}
+
+/* =========================================
+RESPONSIVE
+========================================= */
+
+@media(max-width:768px){
+
+.messages-title{
+font-size:24px;
+}
+
+.message-content,
+.message-actions{
+padding-left:0;
+}
+
+.message-admin-card{
+padding:20px;
+}
+
+.message-stat-number{
+font-size:28px;
+}
+
+.pagination{
+justify-content:center;
+}
+
+}
+
+</style>
+
+<div class="messages-page">
+
+    <!-- HEADER -->
+    <div class="messages-header">
+
+        <div class="messages-header-left">
+
+            <h1 class="messages-title">
+                Messages
+            </h1>
+
+            <p class="messages-subtitle">
+                Consultez l’historique des conversations et les échanges
+                effectués entre les utilisateurs de la plateforme CreToNet.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="messages-stats">
+
+        <div class="message-stat-card">
+
+            <div class="message-stat-top">
+
+                <span class="message-stat-label">
+                    Messages enregistrés
+                </span>
+
+                <div class="message-stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+
+            </div>
+
+            <h2 class="message-stat-number">
+                {{ total_messages }}
+            </h2>
+
+        </div>
+
+    </div>
+
+    <!-- BOX -->
+    <div class="messages-box">
+
+        <div class="messages-box-header">
+
+            <h3>
+                <i class="fas fa-message"></i>
+                Messages récents
+            </h3>
+
+            <span class="admin-badge blue">
+                {{ total_messages }} message{{ total_messages|pluralize }}
+            </span>
+
+        </div>
+        <!-- TOOLS BAR -->
+<div class="messages-tools">
+
+    <!-- SEARCH -->
+    <form method="GET" class="messages-search">
+
+        <i class="fas fa-search"></i>
+
+        <input type="text"
+               name="q"
+               placeholder="Rechercher expéditeur, destinataire ou message..."
+               value="{{ request.GET.q }}">
+
+    </form>
+
+    <!-- FILTERS -->
+    <div class="messages-filters">
+
+        <a href="{% url 'admin_message_list' %}"
+           class="filter-btn {% if not request.GET.filter %}active{% endif %}">
+            Tous
+        </a>
+
+        <a href="?filter=today"
+           class="filter-btn {% if request.GET.filter == 'today' %}active{% endif %}">
+            Aujourd’hui
+        </a>
+
+        <a href="?filter=month"
+           class="filter-btn {% if request.GET.filter == 'month' %}active{% endif %}">
+            Ce mois
+        </a>
+
+    </div>
+
+</div>
+
+        {% if messages_list %}
+
+        <div class="messages-admin-list">
+
+            {% for message in messages_list %}
+
+            <div class="message-admin-card">
+
+                <!-- TOP -->
+                <div class="message-admin-top">
+
+                    <div class="message-user-info">
+
+                        <div class="message-avatar">
+                            {{ message.expediteur.username|slice:":1"|upper }}
+                        </div>
+
+                        <div class="message-user-text">
+
+                            <h4>
+                                {{ message.expediteur.username }}
+                            </h4>
+
+                            <span>
+                                vers {{ message.destinataire.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="message-date">
+                        {{ message.created_at|date:"d/m/Y H:i" }}
+                    </div>
+
+                </div>
+
+                <!-- CONTENT -->
+                <div class="message-content">
+
+                    {{ message.contenu|truncatechars:250 }}
+
+                </div>
+
+            <!-- ACTIONS -->
+            <div class="message-actions">
+
+                <a href="{% url 'admin_message_detail' message.id %}"
+                class="message-btn view">
+
+                    <i class="fas fa-eye"></i>
+                    Voir
+
+                </a>
+
+                <a href="{% url 'admin_delete_message' message.id %}"
+                class="message-btn delete"
+                onclick="return confirm('Voulez-vous vraiment supprimer ce message ?');">
+
+                    <i class="fas fa-trash"></i>
+                    Supprimer
+
+                </a>
+
+            </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- PAGINATION -->
+
+        {% if messages_list.has_other_pages %}
+
+        <div class="pagination-wrapper">
+
+            <div class="pagination">
+
+                <!-- PREVIOUS -->
+
+                {% if messages_list.has_previous %}
+
+                <a href="?page={{ messages_list.previous_page_number }}"
+                   class="pagination-btn">
+
+                    <i class="fas fa-chevron-left"></i>
+
+                </a>
+
+                {% else %}
+
+                <span class="pagination-btn disabled">
+
+                    <i class="fas fa-chevron-left"></i>
+
+                </span>
+
+                {% endif %}
+
+                <!-- NUMBERS -->
+
+                {% for num in messages_list.paginator.page_range %}
+
+                    {% if messages_list.number == num %}
+
+                        <span class="pagination-number active">
+                            {{ num }}
+                        </span>
+
+                    {% elif num > messages_list.number|add:'-3' and num < messages_list.number|add:'3' %}
+
+                        <a href="?page={{ num }}"
+                           class="pagination-number">
+
+                            {{ num }}
+
+                        </a>
+
+                    {% endif %}
+
+                {% endfor %}
+
+                <!-- NEXT -->
+
+                {% if messages_list.has_next %}
+
+                <a href="?page={{ messages_list.next_page_number }}"
+                   class="pagination-btn">
+
+                    <i class="fas fa-chevron-right"></i>
+
+                </a>
+
+                {% else %}
+
+                <span class="pagination-btn disabled">
+
+                    <i class="fas fa-chevron-right"></i>
+
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        {% else %}
+
+        <div class="empty-admin-state">
+
+            <i class="fas fa-envelope-open-text"></i>
+
+            <h3>
+                Aucun message
+            </h3>
+
+            <p>
+                Aucun message n’est encore disponible sur la plateforme.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

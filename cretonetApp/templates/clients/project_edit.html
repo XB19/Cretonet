@@ -1,0 +1,159 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Modifier le projet - CreToNet{% endblock %}
+
+{% block content %}
+<style>
+/* ==== LAYOUT BEHANCE STYLE ==== */
+.project-wrapper { min-height: 100vh; display: flex; justify-content: center; align-items: center; background: #f0f4f8; padding: 60px 20px; }
+.project-card { width: 100%; max-width: 1100px; background: #fff; padding: 40px 40px 60px; border-radius: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.08); position: relative; }
+.project-card h2 { text-align: center; font-size: 1.9rem; font-weight: 700; color: #0d3b66; margin-bottom: 25px; }
+.preview-zone { width: 100%; max-width: 900px; margin: 0 auto 30px; min-height: 350px; border: 2px dashed #cfd8dc; background: #fafafa; border-radius: 16px; display: grid; grid-template-columns: repeat(2,1fr); gap:14px; align-items: start; justify-items: center; padding:18px; }
+.preview-zone.empty { display: flex; justify-content:center; align-items:center; text-align:center; padding:45px; color:#999; }
+.preview-item { width:100%; border-radius:14px; overflow:hidden; box-shadow:0 6px 16px rgba(0,0,0,0.08); background:#fff; display:flex; flex-direction:column; gap:8px; position: relative; }
+.preview-thumb { width:100%; height:200px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#f7f7f8; }
+.preview-thumb img, .preview-thumb video { width:100%; height:100%; object-fit:cover; }
+.preview-meta { padding:10px 12px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.meta-title { font-weight:600; font-size:0.95rem; color:#222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.meta-controls { display:flex; gap:6px; }
+.ctrl-btn { background:#fff; border:1px solid #e8e8e8; padding:6px 8px; border-radius:8px; cursor:pointer; font-size:0.9rem; }
+.ctrl-btn:hover { background:#f3f3f3; }
+.preview-menu { position:absolute; top:10px; right:10px; background:#fff; box-shadow:0 6px 18px rgba(0,0,0,0.12); border-radius:10px; overflow:hidden; display:none; z-index:20; }
+.preview-menu button { width:170px; padding:10px 12px; text-align:left; border:none; background:#fff; cursor:pointer; }
+.preview-menu button:hover { background:#f4f4f4; }
+.preview-item.show-menu .preview-menu { display:block; }
+.action-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:22px; margin-bottom:18px; max-width:800px; margin:0 auto 30px; }
+.action-card { background:#fff; border-radius:18px; padding:20px 10px; text-align:center; box-shadow:0 8px 18px rgba(0,0,0,0.06); cursor:pointer; transition:0.3s ease; }
+.action-card:hover { transform: translateY(-6px); box-shadow:0 16px 30px rgba(0,0,0,0.12); }
+.action-card i { font-size:2.3rem; color:#0d3b66; margin-bottom:8px; }
+.action-card span { font-weight:600; font-size:0.95rem; color:#333; }
+.btn-publish { padding:14px 40px; background:#ff6600; color:#fff; border:none; font-size:1rem; font-weight:700; border-radius:40px; display:block; margin:10px auto 0; cursor:pointer; transition:0.3s ease; }
+.btn-publish:hover { transform: translateY(-3px); opacity:.95; }
+#project-form input, #project-form select, #project-form textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #e6e6e6; margin-bottom:12px; }
+</style>
+
+<div class="project-wrapper">
+    <div class="project-card">
+        <h2 id="main-title">Modifier votre projet</h2>
+
+        <div id="preview-zone" class="preview-zone empty">
+            <div>
+                <p>Téléversez des images, vidéos ou fichiers pour prévisualiser ici.</p>
+                <small>Sélection multiple supportée — les éléments s’ajoutent automatiquement en galerie.</small>
+            </div>
+        </div>
+
+        <!-- Inputs cachés -->
+        <input type="file" id="upload-image" accept="image/*" multiple hidden>
+        <input type="file" id="upload-video" accept="video/*,audio/*" multiple hidden>
+        <input type="file" id="upload-prototype" accept=".pdf,.fig,.xd,.sketch,.zip" multiple hidden>
+        <input type="file" id="upload-3d" accept=".obj,.fbx,.glb,.gltf,.zip" multiple hidden>
+
+        <!-- ACTION CARDS -->
+        <div class="action-cards">
+            <div class="action-card" data-type="image"><i class="bi bi-images"></i><span>Image</span></div>
+            <div class="action-card" data-type="video"><i class="bi bi-camera-video"></i><span>Vidéos & Audio</span></div>
+            <div class="action-card" data-type="prototype"><i class="bi bi-laptop"></i><span>Prototype</span></div>
+            <div class="action-card" data-type="3d"><i class="bi bi-box-seam"></i><span>Ressources 3D</span></div>
+        </div>
+
+        <button class="btn-publish" id="btn-publish">Continuer</button>
+
+        <form id="project-form" style="display:none; margin-top:30px;" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="status" id="project-status" value="{{ project.status }}">
+            <input type="text" name="title" id="project-title" placeholder="Titre du projet" value="{{ project.title }}">
+            <textarea name="description" id="project-desc" rows="4" placeholder="Description détaillée">{{ project.description }}</textarea>
+            <select name="category" id="project-category">
+                <option value="">Sélectionnez une catégorie</option>
+                <option value="design_graphique" {% if project.category == 'design_graphique' %}selected{% endif %}>Design graphique</option>
+                <option value="dev_web" {% if project.category == 'dev_web' %}selected{% endif %}>Développement web</option>
+                <option value="ui_ux" {% if project.category == 'ui_ux' %}selected{% endif %}>UI/UX</option>
+            </select>
+            <input type="text" name="technologies" id="project-tools" placeholder="Technologies / Outils" value="{{ project.technologies }}">
+            <input type="url" name="demo_link" id="project-link" placeholder="Lien de démonstration / GitHub" value="{{ project.demo_link }}">
+
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button type="button" class="btn-ghost" id="btn-draft">💾 Enregistrer brouillon</button>
+                <button type="button" class="btn-publish" id="btn-final-publish">🚀 Publier le projet</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<script>
+let items = [];
+let uidCounter = 0;
+
+const previewZone = document.getElementById('preview-zone');
+const actionCards = document.querySelector('.action-cards');
+const btnPublish = document.getElementById('btn-publish');
+
+const inputs = {
+    'image': document.getElementById('upload-image'),
+    'video': document.getElementById('upload-video'),
+    'prototype': document.getElementById('upload-prototype'),
+    '3d': document.getElementById('upload-3d'),
+};
+
+// Pré-remplir fichiers existants
+{% for img in images %}
+items.push({ id: uidCounter++, type:'image', file:null, url:'{{ img.image.url }}', title:'{{ img.file.name }}' });
+{% endfor %}
+
+function renderGallery() {
+    previewZone.classList.remove('empty');
+    previewZone.innerHTML = '';
+    if(items.length===0){ previewZone.classList.add('empty'); previewZone.innerHTML='<div><p>Téléversez des images, vidéos ou fichiers pour prévisualiser ici.</p></div>'; return; }
+    items.forEach(it=>{
+        const wrap=document.createElement('div'); wrap.className='preview-item';
+        wrap.dataset.id=it.id;
+        const thumb=document.createElement('div'); thumb.className='preview-thumb';
+        if(it.url){ const img=document.createElement('img'); img.src=it.url; thumb.appendChild(img); }
+        wrap.appendChild(thumb);
+        const meta=document.createElement('div'); meta.className='preview-meta';
+        const titleSpan=document.createElement('div'); titleSpan.className='meta-title'; titleSpan.textContent=it.title||''; meta.appendChild(titleSpan);
+        wrap.appendChild(meta);
+        previewZone.appendChild(wrap);
+    });
+}
+renderGallery();
+
+// Action cards
+document.querySelectorAll('.action-card').forEach(card=>{ card.addEventListener('click',()=>inputs[card.dataset.type].click()); });
+Object.values(inputs).forEach(inp=>{ inp.addEventListener('change',e=>{ for(const f of e.target.files){ const type=f.type.startsWith('image/')?'image':'video'; const url=URL.createObjectURL(f); items.push({ id:uidCounter++, type, file:f, url, title:'' }); } renderGallery(); }); });
+
+// Bouton "Continuer"
+btnPublish.addEventListener('click',()=>{
+    if(items.length===0){ alert('Veuillez téléverser au moins un fichier.'); return; }
+    previewZone.style.display='none'; actionCards.style.display='none'; btnPublish.style.display='none';
+    document.getElementById('project-form').style.display='block'; window.scrollTo({ top:0, behavior:'smooth' });
+});
+
+// Brouillon
+document.getElementById('btn-draft').addEventListener('click',()=>{
+    const formEl=document.getElementById('project-form'); const formData=new FormData(formEl);
+    formData.set('status','draft');
+    items.forEach(it=>{ if(it.file) formData.append('images',it.file); });
+    fetch("{% url 'edit_project' pk=project.id %}",{ method:'POST', headers:{'X-CSRFToken':document.querySelector('[name=csrfmiddlewaretoken]').value }, body:formData })
+    .then(res=>res.json()).then(data=>{ alert(data.message); }).catch(err=>alert('Erreur: '+err));
+});
+
+// Publier
+document.getElementById('btn-final-publish').addEventListener('click',(e)=>{
+    e.preventDefault();
+    const title=document.getElementById('project-title').value.trim();
+    const desc=document.getElementById('project-desc').value.trim();
+    const category=document.getElementById('project-category').value;
+    if(!title||!desc||!category){ alert('Veuillez remplir tous les champs obligatoires.'); return; }
+    if(items.length===0){ alert('Veuillez téléverser au moins un fichier.'); return; }
+    const formEl=document.getElementById('project-form'); const formData=new FormData(formEl);
+    formData.set('status','published');
+    items.forEach(it=>{ if(it.file) formData.append('images',it.file); });
+    fetch("{% url 'edit_project' pk=project.id %}",{ method:'POST', headers:{'X-CSRFToken':document.querySelector('[name=csrfmiddlewaretoken]').value }, body:formData })
+    .then(res=>res.json()).then(data=>{ alert(data.message); window.location.href='/profil/'; }).catch(err=>alert('Erreur serveur: '+err));
+});
+</script>
+{% endblock %}

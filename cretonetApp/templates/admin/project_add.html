@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Ajouter un projet{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">➕ Ajouter un projet</h1>
+
+<form method="post" class="admin-form">
+    {% csrf_token %}
+
+    <label>Propriétaire</label>
+    <select name="owner" required>
+        {% for user in users %}
+            <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Titre</label>
+    <input type="text" name="title" required>
+
+    <label>Description</label>
+    <textarea name="description" required></textarea>
+
+    <label>Catégorie</label>
+    <select name="category" required>
+        <option value="design_graphique">Design Graphique</option>
+        <option value="dev_web">Développement Web</option>
+        <option value="ui_ux">UI/UX</option>
+    </select>
+
+    <label>Technologies</label>
+    <input type="text" name="technologies">
+
+    <button type="submit" class="btn-add">Enregistrer</button>
+
+</form>
+
+{% endblock %}

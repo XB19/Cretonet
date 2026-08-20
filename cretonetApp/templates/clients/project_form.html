@@ -1,0 +1,22 @@
+<input type="text" name="title" id="project-title" placeholder="Titre du projet" value="{{ project.title }}">
+<textarea name="description" id="project-desc" rows="4">{{ project.description }}</textarea>
+<select name="category" id="project-category">
+    <option value="">Sélectionnez une catégorie</option>
+    <option value="design_graphique" {% if project.category == 'design_graphique' %}selected{% endif %}>Design graphique</option>
+    <option value="dev_web" {% if project.category == 'dev_web' %}selected{% endif %}>Développement web</option>
+    <option value="ui_ux" {% if project.category == 'ui_ux' %}selected{% endif %}>UI/UX</option>
+</select>
+<input type="text" name="technologies" id="project-tools" placeholder="Technologies / Outils" value="{{ project.technologies }}">
+<input type="url" name="demo_link" id="project-link" placeholder="Lien de démonstration / GitHub" value="{{ project.demo_link }}">
+<div id="preview-zone" class="preview-zone">
+  {% for img in images %}
+  <div class="preview-item" data-id="{{ forloop.counter0 }}">
+      <div class="preview-thumb">
+          <img src="{{ img.file.url }}" alt="">
+      </div>
+      <div class="preview-meta">
+          <div class="meta-title">{{ img.file.name }}</div>
+      </div>
+  </div>
+  {% endfor %}
+</div>

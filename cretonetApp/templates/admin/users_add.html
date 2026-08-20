@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Ajouter un utilisateur{% endblock %}
+
+{% block content %}
+<h1 class="page-title">➕ Ajouter un utilisateur</h1>
+
+<form method="POST" class="admin-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="email">Email :</label>
+        <input type="email" name="email" id="email" placeholder="exemple@mail.com" required>
+    </div>
+
+    <div class="form-group">
+        <label for="role">Rôle :</label>
+        <select name="role" id="role" required>
+            <option value="">-- Choisir un rôle --</option>
+            <option value="admin">Admin</option>
+            <option value="user">Utilisateur</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Mot de passe :</label>
+        <input type="password" name="password" id="password" placeholder="********" required>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn-add">Ajouter</button>
+        <a href="{% url 'admin_user_list' %}" class="btn-action view">Annuler</a>
+    </div>
+</form>
+{% endblock %}
+
+

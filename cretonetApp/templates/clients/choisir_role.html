@@ -1,0 +1,35 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Choisir un rôle - CreToNet{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:1000px;margin:60px auto;text-align:center;">
+  <h2>Créer un compte</h2>
+  <p>Choisissez votre rôle sur la plateforme</p>
+
+  <div style="display:flex;gap:24px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
+    <!-- Client -->
+    <a href="{% url 'inscription_role' kind='client' %}" style="width:360px;text-decoration:none;">
+      <div style="padding:28px;border-radius:12px;border:1px solid #eee;background:#fff;text-align:left;">
+        <h3>Je suis Client</h3>
+        <p>Je recherche un prestataire pour mon projet.</p>
+        <div style="margin-top:14px;">
+          <button class="btn-orange">S'inscrire comme Client</button>
+        </div>
+      </div>
+    </a>
+
+    <!-- Prestataire / Designer -->
+    <a href="{% url 'inscription_role' kind='prestataire' %}" style="width:360px;text-decoration:none;">
+      <div style="padding:28px;border-radius:12px;border:1px solid #eee;background:#fff;text-align:left;">
+        <h3>Je suis Prestataire</h3>
+        <p>Je propose mes services (design, développement, etc.).</p>
+        <div style="margin-top:14px;">
+          <button class="btn-orange">S'inscrire comme Prestataire</button>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+{% endblock %}

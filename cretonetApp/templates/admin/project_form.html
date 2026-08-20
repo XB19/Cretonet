@@ -1,0 +1,40 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+<h1 class="page-title">
+    {% if mode == 'add' %}➕ Ajouter un projet{% else %}✏️ Modifier le projet{% endif %}
+</h1>
+
+<form method="post" class="admin-form">
+    {% csrf_token %}
+
+    <label>Propriétaire</label>
+    <select name="owner" required>
+        {% for user in users %}
+            <option value="{{ user.id }}"
+                {% if project.owner.id == user.id %}selected{% endif %}>
+                {{ user.username }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>Titre</label>
+    <input type="text" name="title" value="{{ project.title }}" required>
+
+    <label>Description</label>
+    <textarea name="description" required>{{ project.description }}</textarea>
+
+    <label>Catégorie</label>
+    <select name="category">
+        <option value="design_graphique">Design Graphique</option>
+        <option value="dev_web">Développement Web</option>
+        <option value="ui_ux">UI/UX</option>
+    </select>
+
+    <label>Technologies</label>
+    <input type="text" name="technologies" value="{{ project.technologies }}">
+
+    <button type="submit" class="btn-add">Enregistrer</button>
+</form>
+
+{% endblock %}

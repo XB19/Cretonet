@@ -1,0 +1,200 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Messagerie - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+.messagerie-page {
+  max-width: 1100px;
+  margin: 40px auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+}
+
+.messagerie-sidebar {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  height: 75vh;
+  overflow-y: auto;
+}
+
+.messagerie-sidebar h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: #111;
+  transition: background 0.25s;
+}
+
+.contact-item:hover {
+  background: #f3f4f6;
+}
+
+.contact-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.contact-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.contact-role {
+  font-size: 12px;
+  color: #666;
+}
+
+.messagerie-conversation {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  height: 75vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.conversation-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.message {
+  margin-bottom: 10px;
+}
+
+.message.moi {
+  text-align: right;
+}
+
+.message span {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 15px;
+  background: #f1f0f0;
+}
+
+.message.moi span {
+  background: #DCF8C6;
+}
+
+.message small {
+  display: block;
+  font-size: 10px;
+  color: #999;
+}
+
+.messagerie-conversation form {
+  display: flex;
+  gap: 10px;
+}
+
+.messagerie-conversation textarea {
+  flex: 1;
+  border-radius: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.messagerie-conversation button {
+  border: none;
+  background: #0d6efd;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.notif-badge {
+  background: #ff3b30;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 3px 6px;
+  margin-left: 8px;
+}
+
+</style>
+
+<div class="messagerie-page">
+
+  <!-- ===== SIDEBAR ===== -->
+<div class="messagerie-sidebar">
+  <h3>Repertoire</h3>
+
+  {% if utilisateurs %}
+    {% for u in utilisateurs %}
+      <a href="{% url 'messagerie' u.id_utilisateur %}" class="contact-item">
+        {% if u.photo_profil %}
+          <img src="{{ u.photo_profil.url }}" class="contact-avatar">
+        {% else %}
+          <img src="{% static 'images/default-avatar.png' %}" class="contact-avatar">
+        {% endif %}
+        <div>
+          <div class="contact-name">{{ u.username }}</div>
+          <div class="contact-role">{{ u.get_role_display }}</div>
+        </div>
+      </a>
+    {% empty %}
+      <p>Aucune conversation.</p>
+    {% endfor %}
+  {% endif %}
+</div>
+
+
+  <!-- ===== CONVERSATION ===== -->
+  <div class="messagerie-conversation">
+
+    {% if destinataire %}
+      <h3>Conversation avec {{ destinataire.username }}</h3>
+
+      <div class="conversation-messages">
+        {% for msg in conversation %}
+<div class="message {% if msg.expediteur == user %}moi{% endif %}">
+  <span>{{ msg.contenu|urlize }}</span>
+  <small>{{ msg.created_at|date:"d/m/Y H:i" }}</small>
+</div>
+
+        {% empty %}
+          <p>Aucun message pour le moment.</p>
+        {% endfor %}
+      </div>
+
+      <!-- ✅ FORMULAIRE CORRIGÉ -->
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="contenu" placeholder="Écrire un message..." required>{{ prefill_message }}</textarea>
+    <button type="submit">Envoyer</button>
+</form>
+
+
+
+    {% else %}
+      <div style="text-align:center; color:#777; margin-top:40%;">
+        Sélectionnez une conversation pour commencer
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

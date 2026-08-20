@@ -1,0 +1,128 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard – CreToNet{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Vue d’ensemble de la plateforme CreToNet</p>
+    </div>
+</div>
+
+<!-- Cartes statistiques -->
+<div class="admin-cards">
+    <a href="{% url 'admin_user_list' %}" class="admin-card stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Utilisateurs</span>
+            <span class="stat-icon">
+                <i class="fas fa-users"></i>
+            </span>
+        </div>
+        <h2 class="stat-number">{{ users_count }}</h2>
+        <p class="stat-link">Voir la liste</p>
+    </a>
+
+    <a href="{% url 'admin_project_list' %}" class="admin-card stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Projets</span>
+            <span class="stat-icon">
+                <i class="fas fa-folder-open"></i>
+            </span>
+        </div>
+        <h2 class="stat-number">{{ projects_count }}</h2>
+        <p class="stat-link">Voir la liste</p>
+    </a>
+
+    <a href="{% url 'admin_offer_list' %}" class="admin-card stat-card">
+        <div class="stat-card-top">
+            <span class="stat-label">Offres</span>
+            <span class="stat-icon">
+                <i class="fas fa-briefcase"></i>
+            </span>
+        </div>
+        <h2 class="stat-number">{{ offers_count }}</h2>
+        <p class="stat-link">Voir la liste</p>
+    </a>
+</div>
+
+<!-- Blocs statistiques -->
+<div class="stats-grid">
+
+    <!-- Projets par catégorie -->
+    <div class="stats-box">
+        <div class="stats-box-header">
+            <h3>Projets par catégorie</h3>
+        </div>
+
+        <div class="stats-list">
+            {% for category, count in projects_by_category.items %}
+            <div class="stats-item">
+                <div class="stats-item-top">
+                    <span class="stats-name">{{ category }}</span>
+                    <span class="stats-count">{{ count }}</span>
+                </div>
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width: {% widthratio count projects_count 100 %}%;">
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-state">Aucune donnée disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Offres par catégorie -->
+    <div class="stats-box">
+        <div class="stats-box-header">
+            <h3>Offres par catégorie</h3>
+        </div>
+
+        <div class="stats-list">
+            {% for category, count in offers_by_category.items %}
+            <div class="stats-item">
+                <div class="stats-item-top">
+                    <span class="stats-name">{{ category }}</span>
+                    <span class="stats-count">{{ count }}</span>
+                </div>
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width: {% widthratio count offers_count 100 %}%;">
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-state">Aucune donnée disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Utilisateurs par rôle -->
+    <div class="stats-box">
+        <div class="stats-box-header">
+            <h3>Utilisateurs par rôle</h3>
+        </div>
+
+        <div class="stats-list">
+            {% for role, count in users_by_role.items %}
+            <div class="stats-item">
+                <div class="stats-item-top">
+                    <span class="stats-name">{{ role|capfirst }}</span>
+                    <span class="stats-count">{{ count }}</span>
+                </div>
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width: {% widthratio count users_count 100 %}%;">
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-state">Aucune donnée disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Projets{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">Projets</h1>
+
+<div class="table-actions-top">
+    <!-- Optionnel : ajouter un bouton "Ajouter un projet" si nécessaire -->
+    <!-- <a href="{% url 'admin_project_add' %}" class="btn-add">➕ Ajouter un projet</a> -->
+</div>
+
+<div class="table-wrapper">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Propriétaire</th>
+                <th>Catégorie</th>
+                <th>Technologies</th>
+                <th>Créé le</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ forloop.counter0|add:projects.start_index }}</td>
+                <td>{{ project.title }}</td>
+                <td>{{ project.owner.username }}</td>
+                <td>{{ project.get_category_display }}</td>
+                <td>{{ project.technologies|default:"—" }}</td>
+                <td>{{ project.created_at|date:"d/m/Y" }}</td>
+                <td class="table-actions">
+                    <a href="{% url 'admin_project_detail' project.pk %}" class="btn-action view">Voir</a>
+                    <a href="{% url 'admin_project_delete' project.pk %}" class="btn-action delete"
+                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+                       Supprimer
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="empty-table">Aucun projet trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if projects.has_previous %}
+        <a href="?page={{ projects.previous_page_number }}" class="page-link">
+            &laquo; Précédent
+        </a>
+    {% endif %}
+
+    {% for num in projects.paginator.page_range %}
+        {% if num == projects.number %}
+            <span class="page-link current">{{ num }}</span>
+        {% else %}
+            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if projects.has_next %}
+        <a href="?page={{ projects.next_page_number }}" class="page-link">
+            Suivant &raquo;
+        </a>
+    {% endif %}
+</div>
+
+{% endblock %}

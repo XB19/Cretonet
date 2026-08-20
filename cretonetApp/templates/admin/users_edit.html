@@ -1,0 +1,234 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Modifier un utilisateur{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+USER EDIT PAGE
+========================================================= */
+
+.user-edit-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* HEADER */
+.user-edit-header h1{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+}
+
+.user-edit-subtitle{
+font-size:15px;
+color:#6b7280;
+margin-top:6px;
+line-height:1.7;
+}
+
+/* FORM CARD */
+.user-form-card{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+/* FORM HEADER */
+.user-form-header{
+padding:26px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.user-form-header h3{
+font-size:1.1rem;
+font-weight:800;
+color:#111827;
+}
+
+.user-form-header i{
+color:#ff7a00;
+}
+
+/* FORM BODY */
+.user-form-body{
+padding:30px;
+display:flex;
+flex-direction:column;
+gap:22px;
+}
+
+/* FORM GROUP */
+.form-group{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.form-group label{
+font-size:13px;
+font-weight:700;
+color:#374151;
+}
+
+/* INPUT */
+.form-control{
+height:48px;
+border-radius:14px;
+border:1px solid #e5e7eb;
+padding:0 14px;
+font-size:14px;
+transition:0.2s ease;
+outline:none;
+}
+
+.form-control:focus{
+border-color:#ff7a00;
+box-shadow:0 0 0 4px rgba(255,122,0,0.12);
+}
+
+/* SELECT */
+select.form-control{
+cursor:pointer;
+background:#fff;
+}
+
+/* ACTIONS */
+.form-actions{
+display:flex;
+gap:14px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+.btn-primary{
+height:46px;
+padding:0 20px;
+border:none;
+border-radius:14px;
+background:#ff7a00;
+color:#fff;
+font-size:14px;
+font-weight:700;
+cursor:pointer;
+transition:0.25s ease;
+}
+
+.btn-primary:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 24px rgba(255,122,0,0.22);
+}
+
+.btn-secondary{
+height:46px;
+padding:0 20px;
+border-radius:14px;
+background:#eff6ff;
+color:#2563eb;
+text-decoration:none;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+transition:0.25s ease;
+}
+
+.btn-secondary:hover{
+transform:translateY(-2px);
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.user-edit-header h1{font-size:1.6rem;}
+}
+
+</style>
+
+<div class="user-edit-page">
+
+    <!-- HEADER -->
+    <div class="user-edit-header">
+
+        <h1>✏️ Modifier un utilisateur</h1>
+
+        <p class="user-edit-subtitle">
+            Mettre à jour les informations du compte utilisateur.
+        </p>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="user-form-card">
+
+        <div class="user-form-header">
+            <i class="fas fa-user-edit"></i>
+            <h3>Informations utilisateur</h3>
+        </div>
+
+        <form method="POST" class="user-form-body">
+            {% csrf_token %}
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label>Email</label>
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ user.email }}"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <!-- ROLE -->
+            <div class="form-group">
+                <label>Rôle</label>
+                <select name="role" class="form-control" required>
+
+                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>
+                        Administrateur
+                    </option>
+
+                    <option value="designer" {% if user.role == 'designer' %}selected{% endif %}>
+                        Designer
+                    </option>
+
+                    <option value="developpeur" {% if user.role == 'developpeur' %}selected{% endif %}>
+                        Développeur
+                    </option>
+
+                    <option value="recruteur" {% if user.role == 'recruteur' %}selected{% endif %}>
+                        Recruteur
+                    </option>
+
+                </select>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="form-actions">
+
+                <button type="submit" class="btn-primary">
+                    💾 Mettre à jour
+                </button>
+
+                <a href="{% url 'admin_user_list' %}" class="btn-secondary">
+                    ← Annuler
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

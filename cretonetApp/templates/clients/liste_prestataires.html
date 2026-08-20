@@ -1,0 +1,252 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Prestataires - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>  
+/* ===== SECTION ===== */
+.prestataires-section {
+  padding: 40px 0 80px;
+  background-color: #ffffff;
+}
+
+.prestataires-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* ===== TITRE ===== */
+.prestataires-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* ===== RECHERCHE ===== */
+.prestataire-search {
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto 20px;
+}
+
+.prestataire-search input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  outline: none;
+}
+
+.prestataire-search button {
+  background: #000;
+  color: #fff;
+  padding: 0 18px;
+  border: none;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+}
+
+/* ===== FILTRES ===== */
+.prestataire-filters {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-btn {
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+  background: #f3f3f3;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #000;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.filter-btn.active {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+/* ===== GRILLE ===== */
+.prestataire-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+  justify-content: center;
+}
+
+/* ===== CARTE ===== */
+.prestataire-card {
+  background: #f3f3f3;
+  border-radius: 18px;
+  padding: 25px 20px;
+  text-align: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.prestataire-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 35px rgba(0,0,0,0.08);
+}
+
+/* ===== AVATAR ===== */
+.prestataire-avatar {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  margin: auto;
+  margin-bottom: 10px;
+}
+
+.prestataire-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+}
+
+.online-dot {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 14px;
+  height: 14px;
+  background: #22c55e;
+  border-radius: 50%;
+  border: 3px solid #f3f3f3;
+}
+
+/* ===== INFOS ===== */
+.prestataire-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 10px 0 5px;
+}
+
+.prestataire-role {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.prestataire-bio {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 12px;
+  min-height: 40px;
+}
+
+/* ===== BOUTON ===== */
+.prestataire-btn {
+  display: inline-block;
+  background: #f97316;
+  color: #ffffff;
+  padding: 10px 24px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.prestataire-btn:hover {
+  background: #ea580c;
+}
+
+/* ===== TEXTE VIDE ===== */
+.empty-text {
+  text-align: center;
+  color: #666;
+  margin-top: 40px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .prestataire-search {
+    max-width: 100%;
+  }
+  .prestataire-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<section class="prestataires-section">
+  <div class="prestataires-container">
+
+    <h2 class="prestataires-title">Nos prestataires disponibles</h2>
+
+    <!-- ===== Formulaire Recherche ===== -->
+    <form method="get" class="prestataire-search">
+      <input type="text" name="q" placeholder="Rechercher un prestataire par nom..." value="{{ q }}">
+      <button type="submit"><i class="fas fa-search"></i></button>
+    </form>
+
+    <!-- ===== Filtres ===== -->
+    <div class="prestataire-filters">
+      <a href="{% url 'prestataires_list' %}{% if q %}?q={{ q }}{% endif %}" 
+         class="filter-btn {% if not role %}active{% endif %}">Tous</a>
+      <a href="?role=designer{% if q %}&q={{ q }}{% endif %}" 
+         class="filter-btn {% if role == 'designer' %}active{% endif %}">Designer</a>
+      <a href="?role=developpeur{% if q %}&q={{ q }}{% endif %}" 
+         class="filter-btn {% if role == 'developpeur' %}active{% endif %}">Développeur</a>
+    </div>
+
+    {% if prestataires %}
+    <div class="prestataire-grid">
+      {% for user in prestataires %}
+      <div class="prestataire-card">
+
+        <div class="prestataire-avatar">
+          {% if user.photo_profil %}
+            <img src="{{ user.photo_profil.url }}" alt="{{ user.username }}">
+          {% else %}
+            <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
+          {% endif %}
+          <span class="online-dot"></span>
+        </div>
+
+        <h4 class="prestataire-name">{{ user.username }}</h4>
+        <p class="prestataire-role">{{ user.get_role_display }}</p>
+
+        <!-- ===== BIO ===== -->
+        {% if user.bio %}
+        <p class="prestataire-bio">{{ user.bio|truncatewords:20 }}</p>
+        {% else %}
+        <p class="prestataire-bio">Aucune description disponible.</p>
+        {% endif %}
+
+        <a href="{% url 'profil_utilisateur' user.id_utilisateur %}" class="prestataire-btn">
+          Voir le profil →
+        </a>
+
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="empty-text">Aucun prestataire disponible pour le moment.</p>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

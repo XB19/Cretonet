@@ -1,0 +1,10 @@
+{% extends 'clients/base.html' %}
+{% block title %}Offre publiée - CreToNet{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+    <h2 style="color:#0d3b66;">🎉 Félicitations !</h2>
+    <p>Votre offre a été publiée avec succès.</p>
+    <a href="{% url 'mon_profil' %}" style="padding:10px 20px; background:#ff6600; color:#fff; border-radius:8px; text-decoration:none;">Voir mes offres</a>
+</div>
+{% endblock %}

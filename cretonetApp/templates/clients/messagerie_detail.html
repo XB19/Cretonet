@@ -1,0 +1,203 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Messagerie - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ===== PAGE ===== */
+.chat-page {
+  padding: 30px 20px;
+  background: #f6f6f6;
+  min-height: 100vh;
+}
+
+/* ===== CONTENEUR ===== */
+.chat-container {
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+}
+
+/* ===== HEADER ===== */
+.chat-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chat-user h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.chat-user span {
+  font-size: .8rem;
+  color: #777;
+}
+
+/* ===== MESSAGES ===== */
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+/* Message */
+.message {
+  max-width: 65%;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: .9rem;
+  line-height: 1.45;
+  position: relative;
+}
+
+/* Message envoyé */
+.message.sent {
+  margin-left: auto;
+  background: #ff6600;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+/* Message reçu */
+.message.received {
+  margin-right: auto;
+  background: #eaeaea;
+  color: #333;
+  border-bottom-left-radius: 4px;
+}
+
+/* Heure */
+.message-time {
+  display: block;
+  font-size: .7rem;
+  opacity: .7;
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* ===== FORMULAIRE ===== */
+.chat-form {
+  border-top: 1px solid #eee;
+  padding: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-form textarea {
+  flex: 1;
+  resize: none;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  font-size: .9rem;
+  outline: none;
+  height: 44px;
+}
+
+.chat-form button {
+  background: #ff6600;
+  border: none;
+  color: #fff;
+  padding: 0 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.chat-form button:hover {
+  background: #e55a00;
+}
+</style>
+
+<section class="chat-page">
+  <div class="chat-container">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <div class="chat-avatar">
+        {% if destinataire.photo_profil %}
+          <img src="{{ destinataire.photo_profil.url }}" alt="{{ destinataire.username }}">
+        {% else %}
+          <img src="{% static 'images/default-avatar.png' %}">
+        {% endif %}
+      </div>
+
+      <div class="chat-user">
+        <h4>{{ destinataire.username }}</h4>
+        <span>{{ destinataire.get_role_display }}</span>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="chat-messages" id="chatBox">
+      {% for msg in messages %}
+        {% if msg.expediteur == request.user %}
+          <div class="message sent">
+            {{ msg.contenu }}
+            <span class="message-time">
+              {{ msg.created_at|date:"H:i" }}
+            </span>
+          </div>
+        {% else %}
+          <div class="message received">
+            {{ msg.contenu }}
+            <span class="message-time">
+              {{ msg.created_at|date:"H:i" }}
+            </span>
+          </div>
+        {% endif %}
+      {% empty %}
+        <p style="text-align:center; color:#888;">Aucun message pour le moment.</p>
+      {% endfor %}
+    </div>
+
+    <!-- FORMULAIRE -->
+    <form method="post" class="chat-form">
+      {% csrf_token %}
+      <textarea
+        name="contenu"
+        placeholder="Écrire un message..."
+        required
+      ></textarea>
+      <button type="submit">Envoyer</button>
+    </form>
+
+  </div>
+</section>
+
+<script>
+// Scroll automatique en bas
+const chatBox = document.getElementById("chatBox");
+chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+{% endblock %}

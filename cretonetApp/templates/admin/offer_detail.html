@@ -1,0 +1,751 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}
+Détail offre
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+OFFER DETAIL PAGE
+========================================================= */
+
+.offer-detail-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* =========================================================
+HEADER
+========================================================= */
+
+.offer-detail-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.offer-detail-left{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.offer-detail-title{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+line-height:1.2;
+}
+
+.offer-detail-subtitle{
+font-size:15px;
+color:#6b7280;
+line-height:1.7;
+max-width:760px;
+}
+
+/* =========================================================
+TOP CARDS
+========================================================= */
+
+.offer-detail-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:20px;
+}
+
+.detail-stat-card{
+background:#fff;
+border-radius:24px;
+padding:24px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 18px rgba(15,23,42,0.04);
+position:relative;
+overflow:hidden;
+transition:0.3s ease;
+}
+
+.detail-stat-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,#ff7a00,#ffb347);
+}
+
+.detail-stat-card:hover{
+transform:translateY(-4px);
+box-shadow:0 18px 35px rgba(15,23,42,0.08);
+}
+
+.detail-stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.detail-stat-label{
+font-size:14px;
+font-weight:600;
+color:#6b7280;
+}
+
+.detail-stat-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:rgba(255,122,0,0.10);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:#ff7a00;
+}
+
+.detail-stat-value{
+font-size:1.3rem;
+font-weight:800;
+color:#111827;
+line-height:1.4;
+word-break:break-word;
+}
+
+/* =========================================================
+MAIN BOX
+========================================================= */
+
+.offer-detail-box{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+.offer-detail-box-header{
+padding:28px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.offer-detail-box-header h3{
+display:flex;
+align-items:center;
+gap:12px;
+font-size:1.15rem;
+font-weight:800;
+color:#111827;
+}
+
+.offer-detail-box-header h3 i{
+color:#ff7a00;
+}
+
+/* =========================================================
+CONTENT
+========================================================= */
+
+.offer-detail-content{
+padding:32px;
+display:flex;
+flex-direction:column;
+gap:30px;
+}
+
+/* =========================================================
+GRID
+========================================================= */
+
+.offer-detail-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:22px;
+}
+
+.offer-detail-item{
+background:#f8fafc;
+border-radius:20px;
+padding:22px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.offer-detail-item-label{
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.4px;
+color:#6b7280;
+}
+
+.offer-detail-item-value{
+font-size:15px;
+font-weight:600;
+color:#111827;
+line-height:1.7;
+word-break:break-word;
+}
+
+/* =========================================================
+STATUS BADGE
+========================================================= */
+
+.status-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:10px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+width:fit-content;
+}
+
+.status-badge.pending{
+background:#fff7ed;
+color:#ea580c;
+}
+
+.status-badge.approved{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.status-badge.rejected{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.status-badge.draft{
+background:#f3f4f6;
+color:#4b5563;
+}
+
+/* =========================================================
+DESCRIPTION
+========================================================= */
+
+.offer-description-box{
+background:#f8fafc;
+border-radius:24px;
+padding:28px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.offer-description-title{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:1rem;
+font-weight:800;
+color:#111827;
+}
+
+.offer-description-title i{
+color:#ff7a00;
+}
+
+.offer-description-content{
+font-size:15px;
+line-height:1.9;
+color:#374151;
+white-space:pre-line;
+}
+
+/* =========================================================
+FILE BOX
+========================================================= */
+
+.offer-file-box{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:18px;
+flex-wrap:wrap;
+padding:22px;
+border-radius:20px;
+background:#fff7ed;
+border:1px solid #fed7aa;
+}
+
+.offer-file-left{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.offer-file-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+color:#ff7a00;
+}
+
+.offer-file-text{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+.offer-file-text strong{
+font-size:15px;
+color:#111827;
+}
+
+.offer-file-text span{
+font-size:13px;
+color:#6b7280;
+}
+
+.download-btn{
+height:46px;
+padding:0 22px;
+border-radius:14px;
+background:#ff7a00;
+color:#fff;
+font-size:14px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+transition:0.25s ease;
+}
+
+.download-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 24px rgba(255,122,0,0.22);
+}
+
+/* =========================================================
+ACTIONS
+========================================================= */
+
+.offer-detail-actions{
+display:flex;
+align-items:center;
+gap:14px;
+flex-wrap:wrap;
+padding-top:5px;
+}
+
+.detail-btn{
+height:48px;
+padding:0 22px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+transition:0.25s ease;
+cursor:pointer;
+}
+
+.detail-btn.back{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.detail-btn.delete{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.detail-btn:hover{
+transform:translateY(-2px);
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media(max-width:768px){
+
+.offer-detail-title{
+font-size:1.7rem;
+}
+
+.offer-detail-content{
+padding:22px;
+}
+
+.offer-detail-box-header{
+padding:22px;
+}
+
+.offer-detail-grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+<div class="offer-detail-page">
+
+    <!-- HEADER -->
+    <div class="offer-detail-header">
+
+        <div class="offer-detail-left">
+
+            <h1 class="offer-detail-title">
+                Détail de l’offre
+            </h1>
+
+            <p class="offer-detail-subtitle">
+                Consultez toutes les informations liées à cette offre
+                publiée sur la plateforme CreToNet.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="offer-detail-stats">
+
+        <!-- STATUS -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Statut
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+
+                {% if offer.status == 'available' %}
+
+                <span class="status-badge approved">
+                    Disponible
+                </span>
+
+                {% elif offer.status == 'pending' %}
+
+                <span class="status-badge pending">
+                    En attente
+                </span>
+
+                {% elif offer.status == 'rejected' %}
+
+                <span class="status-badge rejected">
+                    Refusé
+                </span>
+
+                {% else %}
+
+                <span class="status-badge draft">
+                    Brouillon
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Catégorie
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ offer.get_category_display }}
+            </div>
+
+        </div>
+
+        <!-- LOCATION -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Localisation
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-location-dot"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ offer.location }}
+            </div>
+
+        </div>
+
+        <!-- DEADLINE -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Date limite
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-calendar-days"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ offer.deadline|date:"d/m/Y" }}
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN BOX -->
+    <div class="offer-detail-box">
+
+        <div class="offer-detail-box-header">
+
+            <h3>
+                <i class="fas fa-briefcase"></i>
+                Informations de l’offre
+            </h3>
+
+        </div>
+
+        <div class="offer-detail-content">
+
+            <!-- GRID -->
+            <div class="offer-detail-grid">
+
+                <!-- TITLE -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        Titre
+                    </span>
+
+                    <div class="offer-detail-item-value">
+                        {{ offer.title }}
+                    </div>
+
+                </div>
+
+                <!-- OWNER -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        Propriétaire
+                    </span>
+
+                    <div class="offer-detail-item-value">
+                        {{ offer.owner.username }}
+                    </div>
+
+                </div>
+
+                <!-- PROFILE -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        Profil requis
+                    </span>
+
+                    <div class="offer-detail-item-value">
+                        {{ offer.required_profile }}
+                    </div>
+
+                </div>
+
+                <!-- WORK MODE -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        Mode de travail
+                    </span>
+
+                    <div class="offer-detail-item-value">
+                        {{ offer.get_work_mode_display }}
+                    </div>
+
+                </div>
+
+                <!-- CREATED -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        Date de création
+                    </span>
+
+                    <div class="offer-detail-item-value">
+                        {{ offer.created_at|date:"d/m/Y H:i" }}
+                    </div>
+
+                </div>
+
+                <!-- STATUS -->
+                <div class="offer-detail-item">
+
+                    <span class="offer-detail-item-label">
+                        État actuel
+                    </span>
+
+                    <div class="offer-detail-item-value">
+
+                        {% if offer.status == 'available' %}
+
+                        <span class="status-badge approved">
+                            Disponible
+                        </span>
+
+                        {% elif offer.status == 'pending' %}
+
+                        <span class="status-badge pending">
+                            En attente
+                        </span>
+
+                        {% elif offer.status == 'rejected' %}
+
+                        <span class="status-badge rejected">
+                            Refusé
+                        </span>
+
+                        {% else %}
+
+                        <span class="status-badge draft">
+                            Brouillon
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FILE -->
+            {% if offer.file %}
+
+            <div class="offer-file-box">
+
+                <div class="offer-file-left">
+
+                    <div class="offer-file-icon">
+                        <i class="fas fa-file-arrow-down"></i>
+                    </div>
+
+                    <div class="offer-file-text">
+
+                        <strong>
+                            Fichier joint disponible
+                        </strong>
+
+                        <span>
+                            Télécharger le document associé à cette offre
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <a href="{{ offer.file.url }}"
+                   target="_blank"
+                   class="download-btn">
+
+                    <i class="fas fa-download"></i>
+                    Télécharger
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            <!-- DESCRIPTION -->
+            <div class="offer-description-box">
+
+                <div class="offer-description-title">
+
+                    <i class="fas fa-align-left"></i>
+
+                    Description de l’offre
+
+                </div>
+
+                <div class="offer-description-content">
+                    {{ offer.description }}
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="offer-detail-actions">
+
+                <a href="{% url 'admin_offer_delete' offer.pk %}"
+                   class="detail-btn delete"
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+
+                    <i class="fas fa-trash"></i>
+                    Supprimer
+
+                </a>
+
+                <a href="{% url 'admin_validation_list' %}"
+                   class="detail-btn back">
+
+                    <i class="fas fa-arrow-left"></i>
+                    Retour à la liste
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

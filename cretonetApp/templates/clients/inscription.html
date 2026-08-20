@@ -1,0 +1,135 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Inscription - CreToNet{% endblock %}
+
+{% block content %}
+<style>
+/* Ton design reste inchangé */
+.auth-section {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fefefe, #f5f5f5);
+  padding: 50px 15px;
+}
+.auth-container {
+  background: #fff;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 35px;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  text-align: center;
+  animation: fadeInUp 0.7s ease;
+}
+.auth-container h2 {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #222;
+}
+.auth-subtitle {
+  color: #666;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.form-group label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  display: inline-block;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.6px solid #ddd;
+  background: #fafafa;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+.btn-submit {
+  background: #ff6600;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 12px 0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+.btn-submit:hover {
+  background: #e55a00;
+  box-shadow: 0 5px 15px rgba(229,90,0,0.4);
+}
+.auth-link {
+  margin-top: 18px;
+  color: #555;
+  font-size: 0.9rem;
+}
+.auth-link a {
+  color: #ff6600;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth-link a:hover {
+  text-decoration: underline;
+}
+</style>
+
+<section class="auth-section">
+  <div class="auth-container">
+    <h2>Créer un compte {{ role|title }}</h2>
+    <p class="auth-subtitle">Rejoignez la communauté <strong>CreToNet</strong> en tant que {{ role }}</p>
+
+    <form method="post" class="auth-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="form-group">
+        <label for="id_username">Nom d’utilisateur</label>
+        {{ form.username }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_email">Adresse e-mail</label>
+        {{ form.email }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_téléphone">Téléphone</label>
+        {{ form.téléphone }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_adresse">Adresse</label>
+        {{ form.adresse }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password1">Mot de passe</label>
+        {{ form.password1 }}
+      </div>
+
+      <div class="form-group">
+        <label for="id_password2">Confirmez le mot de passe</label>
+        {{ form.password2 }}
+      </div>
+
+      <button type="submit" class="btn-submit">S’inscrire</button>
+    </form>
+
+    <p class="auth-link">
+      Déjà un compte ?
+      <a href="{% url 'connexion' %}">Se connecter</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

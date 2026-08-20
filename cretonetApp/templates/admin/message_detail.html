@@ -1,0 +1,374 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Détail Message – Admin CreToNet
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =====================================
+PAGE
+===================================== */
+
+.message-detail-page{
+    display:flex;
+    flex-direction:column;
+    gap:26px;
+}
+
+/* =====================================
+HEADER
+===================================== */
+
+.page-title{
+    font-size:30px;
+    font-weight:700;
+    color:var(--cto-text);
+}
+
+.page-subtitle{
+    font-size:15px;
+    color:var(--cto-text-light);
+    margin-top:6px;
+    line-height:1.6;
+}
+
+/* =====================================
+BOX (reuse admin style)
+===================================== */
+
+.admin-box{
+    background:var(--cto-white);
+    border-radius:22px;
+    box-shadow:var(--cto-shadow);
+    overflow:hidden;
+}
+
+.admin-box-header{
+    padding:22px 24px;
+    border-bottom:1px solid var(--cto-border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.admin-box-header h3{
+    font-size:18px;
+    font-weight:600;
+    color:var(--cto-text);
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.admin-box-header i{
+    color:var(--cto-orange);
+}
+
+/* =====================================
+BADGE
+===================================== */
+
+.admin-badge{
+    padding:7px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.admin-badge.blue{
+    background:#dbeafe;
+    color:#2563eb;
+}
+
+/* =====================================
+CONTENT
+===================================== */
+
+.message-content{
+    padding:26px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* USER INFO GRID */
+
+.user-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+}
+
+.user-card{
+    background:#f8fafc;
+    border:1px solid var(--cto-border);
+    border-radius:16px;
+    padding:18px;
+    transition:0.2s ease;
+}
+
+.user-card:hover{
+    transform:translateY(-3px);
+}
+
+.user-label{
+    font-size:13px;
+    color:var(--cto-text-light);
+    margin-bottom:6px;
+}
+
+.user-value{
+    font-size:15px;
+    font-weight:600;
+    color:var(--cto-text);
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.user-value i{
+    color:var(--cto-orange);
+}
+
+/* DATE */
+
+.date-box{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    border-radius:14px;
+    border:1px solid var(--cto-border);
+    background:linear-gradient(135deg,#fff,#fafafa);
+}
+
+.date-label{
+    font-size:14px;
+    color:var(--cto-text-light);
+}
+
+.date-value{
+    font-size:13px;
+    font-weight:600;
+    background:#f1f5f9;
+    padding:6px 12px;
+    border-radius:999px;
+}
+
+/* MESSAGE BOX */
+
+.message-box{
+    background:#fff;
+    border:1px solid var(--cto-border);
+    border-radius:18px;
+    padding:22px;
+    box-shadow:var(--cto-shadow);
+}
+
+.message-box-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+}
+
+.message-box-header i{
+    color:var(--cto-orange);
+}
+
+.message-box-header h4{
+    font-size:16px;
+    font-weight:600;
+    color:var(--cto-text);
+}
+
+.message-text{
+    font-size:14px;
+    line-height:1.9;
+    color:#4b5563;
+    white-space:pre-line;
+}
+
+/* ACTIONS */
+
+.actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+
+.btn{
+    height:42px;
+    padding:0 18px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    transition:0.2s ease;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+.btn-back{
+    background:#eff6ff;
+    color:#2563eb;
+}
+
+.btn-delete{
+    background:#fee2e2;
+    color:#dc2626;
+}
+
+/* =====================================
+RESPONSIVE
+===================================== */
+
+@media(max-width:768px){
+
+.page-title{
+    font-size:24px;
+}
+
+.message-content{
+    padding:18px;
+}
+
+}
+
+</style>
+
+
+<div class="message-detail-page">
+
+    <!-- HEADER -->
+    <div>
+
+        <h1 class="page-title">
+            Détail du message
+        </h1>
+
+        <p class="page-subtitle">
+            Consultez les informations complètes du message envoyé entre utilisateurs.
+        </p>
+
+    </div>
+
+
+    <!-- BOX -->
+    <div class="admin-box">
+
+        <div class="admin-box-header">
+
+            <h3>
+                <i class="fas fa-envelope"></i>
+                Message
+            </h3>
+
+            <span class="admin-badge blue">
+                ID #{{ message.id }}
+            </span>
+
+        </div>
+
+
+        <div class="message-content">
+
+            <!-- USERS -->
+            <div class="user-grid">
+
+                <div class="user-card">
+
+                    <p class="user-label">Expéditeur</p>
+
+                    <p class="user-value">
+                        <i class="fas fa-user-circle"></i>
+                        {{ message.expediteur.username }}
+                    </p>
+
+                </div>
+
+
+                <div class="user-card">
+
+                    <p class="user-label">Destinataire</p>
+
+                    <p class="user-value">
+                        <i class="fas fa-user"></i>
+                        {{ message.destinataire.username }}
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- DATE -->
+            <div class="date-box">
+
+                <span class="date-label">
+                    Date d’envoi
+                </span>
+
+                <span class="date-value">
+                    {{ message.created_at|date:"d/m/Y H:i" }}
+                </span>
+
+            </div>
+
+
+            <!-- MESSAGE -->
+            <div class="message-box">
+
+                <div class="message-box-header">
+
+                    <i class="fas fa-comment-dots"></i>
+
+                    <h4>Contenu du message</h4>
+
+                </div>
+
+                <div class="message-text">
+                    {{ message.contenu }}
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="actions">
+
+                <a href="{% url 'admin_message_list' %}" class="btn btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour
+                </a>
+
+                <a href="{% url 'admin_delete_message' message.id %}"
+                   class="btn btn-delete"
+                   onclick="return confirm('Supprimer ce message ?');">
+
+                    <i class="fas fa-trash"></i>
+                    Supprimer
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

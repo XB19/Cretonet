@@ -1,0 +1,359 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+{% block title %}{{ offer.title }} | CreToNet{% endblock %}
+
+{% block content %}
+{% load tz %}
+
+<style>
+/* ================= OFFER DETAIL ================= */
+.offer-detail-container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  font-family: inherit;
+}
+
+/* HEADER */
+.offer-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.offer-detail-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0d3b66;
+  margin: 0;
+}
+
+.offer-detail-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: .3rem;
+}
+
+/* STATUS */
+.offer-status {
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-available { background: #e6f7ec; color: #28a745; }
+.status-completed { background: #fdecea; color: #dc3545; }
+.status-expired { background: #fff3cd; color: #856404; }
+
+/* INFO BOX */
+.offer-detail-box {
+  background: #fafafa;
+  border-radius: 14px;
+  padding: 1.4rem;
+  margin-bottom: 1.6rem;
+}
+
+.offer-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.offer-detail-item span { font-size: 0.75rem; color: #777; display: block; margin-bottom: .15rem; }
+.offer-detail-item strong { font-size: 0.9rem; color: #222; }
+.price-highlight { color: #ff6600; font-weight: 700; }
+.file-link { color: #ff6600; font-weight: 600; font-size: .85rem; text-decoration: none; }
+
+/* DESCRIPTION */
+.offer-detail-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: .6rem;
+  color: #222;
+}
+
+.offer-detail-description {
+  font-size: .9rem;
+  line-height: 1.6;
+  color: #444;
+  white-space: pre-line;
+}
+
+/* ACTIONS */
+.offer-detail-actions { margin-top: 2rem; display: flex; gap: 1rem; }
+.btn-outline {
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-outline.warning { border: 1px solid #ff9900; color: #ff9900; }
+.btn-outline.danger { border: 1px solid #ff3300; color: #ff3300; }
+.btn-outline:hover { background: #f5f5f5; }
+
+/* FORMULAIRE STATUT */
+.status-form { margin-top: 1.5rem; display: flex; align-items: center; gap: 10px; }
+.status-form select {
+  padding: 8px 12px; border-radius: 8px; border:1px solid #ccc; font-size:0.9rem;
+}
+.status-form button {
+  padding: 6px 14px; border-radius:20px; background:#ff6600; color:#fff; border:none;
+  cursor:pointer; font-size:0.85rem;
+}
+
+/* ALERTS */
+.alert { padding: 12px 18px; margin-bottom: 15px; border-radius: 10px; }
+.alert-success { background: #d4edda; color: #155724; }
+.alert-error { background: #f8d7da; color: #721c24; }
+
+@media (max-width: 600px) { .offer-detail-header { flex-direction: column; gap: .8rem; } }
+
+/* ================= AUTRES OFFRES (CARROUSEL) ================= */
+.offres-section { padding: 60px 0 80px; background: #ffffff; }
+.offres-container { max-width: 1200px; margin: auto; padding: 0 20px; }
+.offres-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 30px; color: #222; }
+
+/* Carrousel horizontal */
+.offre-carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: hidden; /* on cache la scrollbar, défilement via JS */
+    padding-bottom: 10px;
+    cursor: grab;
+}
+.offre-carousel::-webkit-scrollbar { display: none; }
+.offre-carousel:active { cursor: grabbing; }
+
+/* Carte offre */
+.offre-card {
+    min-width: 280px;
+    flex: 0 0 auto;
+    background: #f4f4f4;
+    border-radius: 22px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.offre-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+
+.offre-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.offre-title { font-size: 1rem; font-weight: 700; margin: 0; color: #0d3b66; }
+.offre-badge { background: #000; color: #fff; font-size: .65rem; padding: 5px 12px; border-radius: 20px; }
+.offre-desc { margin: 14px 0 18px; font-size: .85rem; color: #555; line-height: 1.6; }
+.offre-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.offre-info small { font-size: .7rem; color: #888; }
+.offre-info span { font-size: .8rem; font-weight: 500; color: #222; }
+.offre-btn { align-self: center; margin-top: 18px; background: #ff6600; color: #fff; padding: 10px 26px; border-radius: 40px; font-size: .75rem; text-decoration: none; transition: all .25s ease; }
+.offre-btn:hover { background: #e65c00; transform: translateY(-2px); }
+
+/* Responsive mobile */
+@media (max-width: 600px) { .offre-card { min-width: 220px; } }
+
+.btn-orange {
+  background: #ff6600;
+  color: #fff;
+  padding: 12px 26px;
+  border-radius: 40px;
+  font-size: .85rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all .25s ease;
+}
+
+.btn-orange:hover {
+  background: #e65c00;
+  transform: translateY(-2px);
+}
+
+
+</style>
+
+<div class="offer-detail-container">
+
+  <!-- MESSAGES -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- HEADER -->
+  <div class="offer-detail-header">
+    <div>
+      <h1 class="offer-detail-title">{{ offer.title }}</h1>
+      <p class="offer-detail-meta">
+        Publié par <strong>{{ offer.owner.username }}</strong> · {{ offer.created_at|date:"d/m/Y" }}
+      </p>
+    </div>
+
+    {% now "Y-m-d" as today %}
+    {% if offer.deadline and offer.deadline < today %}
+      <span class="offer-status status-expired">Expirée</span>
+    {% else %}
+      <span class="offer-status {% if offer.status == 'available' %}status-available{% else %}status-completed{% endif %}">
+        {{ offer.get_status_display }}
+      </span>
+    {% endif %}
+  </div>
+
+  <!-- INFOS -->
+  <div class="offer-detail-box">
+    <div class="offer-detail-grid">
+      <div class="offer-detail-item">
+        <span>Catégorie</span>
+        <strong>{{ offer.get_category_display }}</strong>
+      </div>
+      <div class="offer-detail-item">
+        <span>Profil recherché</span>
+        <strong>{{ offer.required_profile|default:"Non spécifié" }}</strong>
+      </div>
+      <div class="offer-detail-item">
+        <span>Mode de travail</span>
+        <strong>{{ offer.get_work_mode_display }}</strong>
+      </div>
+      <div class="offer-detail-item">
+        <span>Lieu</span>
+        <strong>{{ offer.location }}</strong>
+      </div>
+      <div class="offer-detail-item">
+        <span>Budget</span>
+        <strong class="price-highlight">À négocier</strong>
+      </div>
+      <div class="offer-detail-item">
+        <span>Date limite</span>
+        <strong>{% if offer.deadline %}{{ offer.deadline|date:"d/m/Y" }}{% else %}-{% endif %}</strong>
+      </div>
+      {% if offer.file %}
+      <div class="offer-detail-item">
+        <span>Fichier joint</span>
+        <a href="{{ offer.file.url }}" target="_blank" class="file-link">Télécharger le fichier</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="offer-detail-section">
+    <h3>Description de l’offre</h3>
+    <p class="offer-detail-description">{{ offer.description }}</p>
+  </div>
+  <!-- ACTION PRESTATAIRE -->
+{% if user.is_authenticated and not is_owner %}
+<div class="offer-detail-actions">
+
+
+{% if user.is_authenticated and not is_owner %}
+<div class="offer-detail-actions">
+    <a href="{% url 'messagerie' offer.owner.id_utilisateur %}?{{ encoded_message }}" class="offre-btn">
+        💬 Postuler à cette offre
+    </a>
+</div>
+{% endif %}
+
+
+
+
+
+</div>
+{% endif %}
+
+
+
+  <!-- ACTIONS PROPRIÉTAIRE -->
+  {% if is_owner %}
+  <div class="offer-detail-actions">
+    <a href="{% url 'edit_offer' offer.id %}" class="btn-outline warning">
+      <i class="fas fa-edit"></i> Modifier
+    </a>
+    <a href="{% url 'delete_offer' offer.id %}" class="btn-outline danger"
+       onclick="return confirm('Voulez-vous vraiment supprimer cette offre ?');">
+      <i class="fas fa-trash"></i> Supprimer
+    </a>
+  </div>
+
+  <form method="POST" action="{% url 'change_offer_status' offer.id %}" class="status-form">
+    {% csrf_token %}
+    <label for="status">Changer le statut :</label>
+    <select name="status" id="status">
+      <option value="available" {% if offer.status == "available" %}selected{% endif %}>Disponible</option>
+      <option value="completed" {% if offer.status == "completed" %}selected{% endif %}>Terminé</option>
+    </select>
+    <button type="submit">Mettre à jour</button>
+  </form>
+  {% endif %}
+
+</div>
+
+<!-- ================= AUTRES OFFRES CARROUSEL ================= -->
+{% if other_offers %}
+<section class="offres-section">
+  <div class="offres-container">
+    <h2 class="offres-title">Autres offres qui pourraient vous intéresser</h2>
+
+    <div class="offre-carousel" id="offre-carousel">
+      {% for o in other_offers %}
+      <div class="offre-card">
+        <div>
+          <div class="offre-header">
+            <h3 class="offre-title">{{ o.title }}</h3>
+            <span class="offre-badge">{{ o.get_category_display }}</span>
+          </div>
+          <p class="offre-desc">{{ o.description|truncatechars:140 }}</p>
+          <div class="offre-info">
+            <div>
+              <small>Profil requis</small>
+              <span>{{ o.required_profile }}</span>
+            </div>
+            <div>
+              <small>Deadline</small>
+              <span>{{ o.deadline|date:"d M Y" }}</span>
+            </div>
+          </div>
+        </div>
+        <a href="{% url 'offer_detail' o.id %}" class="offre-btn">Voir l'offre →</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<script>
+// Défilement auto carrousel
+const carousel = document.getElementById('offre-carousel');
+let scrollPos = 0;
+let step = 0.5; // vitesse
+let maxScroll = carousel.scrollWidth - carousel.clientWidth;
+
+function animateCarousel() {
+    scrollPos += step;
+    if(scrollPos > maxScroll) scrollPos = 0;
+    carousel.scrollLeft = scrollPos;
+    requestAnimationFrame(animateCarousel);
+}
+
+// Pause au hover
+carousel.addEventListener('mouseenter', () => step = 0);
+carousel.addEventListener('mouseleave', () => step = 0.5);
+
+// Démarrer
+animateCarousel();
+</script>
+
+{% endblock %}

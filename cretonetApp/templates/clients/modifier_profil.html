@@ -1,0 +1,121 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Modifier mon profil - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ====== PAGE MODIFICATION PROFIL ====== */
+.profile-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f0f4f8;
+    padding: 60px 20px;
+}
+
+.profile-card {
+    width: 100%;
+    max-width: 700px;
+    background: #ffffff;
+    padding: 40px 30px 50px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    animation: fadeInUp .7s ease;
+}
+
+.profile-card h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #278b05;
+    margin-bottom: 25px;
+}
+
+.profile-card input,
+.profile-card select,
+.profile-card textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e5e8ea;
+    margin-bottom: 15px;
+    background: #fafafa;
+    font-size: 0.95rem;
+}
+
+.btn-save {
+    padding: 14px 40px;
+    background: #278b05;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 40px;
+    display: block;
+    margin: 20px auto 0;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.btn-save:hover {
+    transform: translateY(-3px);
+    opacity: .95;
+}
+
+.alert {
+    padding: 12px 18px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+.alert-success { background: #d4edda; color: #155724; }
+.alert-error { background: #f8d7da; color: #721c24; }
+
+</style>
+
+<div class="profile-wrapper">
+    <div class="profile-card">
+        <h2>Modifier mon profil</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Nom d'utilisateur -->
+            <input type="text" name="username" placeholder="Nom d'utilisateur" value="{{ form.username.value }}" required>
+            {{ form.username.errors }}
+
+            <!-- Email -->
+            <input type="email" name="email" placeholder="Email" value="{{ form.email.value }}" required>
+            {{ form.email.errors }}
+
+            <!-- Téléphone -->
+            <input type="text" name="telephone" placeholder="Téléphone" value="{{ form.telephone.value }}">
+            {{ form.telephone.errors }}
+
+            <!-- Adresse -->
+            <input type="text" name="adresse" placeholder="Adresse" value="{{ form.adresse.value }}">
+            {{ form.adresse.errors }}
+
+            <!-- Bio -->
+            <textarea name="bio" rows="4" placeholder="À propos de vous">{{ form.bio.value }}</textarea>
+            {{ form.bio.errors }}
+
+            <!-- Photo de profil -->
+            <input type="file" name="photo_profil">
+            {{ form.photo_profil.errors }}
+
+            <button type="submit" class="btn-save">Enregistrer les modifications</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

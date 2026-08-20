@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block layout %}
+  {% include 'clients/partials/nav.html' %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'clients/partials/footer.html' %}
+{% endblock %}

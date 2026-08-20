@@ -1,0 +1,303 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}{{ projet.title }} - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ====== PAGE PLEIN ÉCRAN ====== */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.project-fullscreen-page {
+  height: 100vh;
+  width: 100vw;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Conteneur scrollable */
+.project-fullscreen-container {
+  flex: 1;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+/* Média plein écran */
+.project-media-wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  background: #111;
+}
+
+.project-media-wrapper img,
+.project-media-wrapper video {
+  max-height: 95%;
+  max-width: 95%;
+  object-fit: contain;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.project-media-wrapper img:hover,
+.project-media-wrapper video:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.project-media-wrapper video {
+  background: #000;
+}
+
+/* Scrollbar */
+.project-fullscreen-container::-webkit-scrollbar {
+  width: 8px;
+}
+.project-fullscreen-container::-webkit-scrollbar-track {
+  background: #222;
+}
+.project-fullscreen-container::-webkit-scrollbar-thumb {
+  background: #ff6600;
+  border-radius: 4px;
+}
+
+/* Titre flottant */
+.project-title-overlay {
+  position: fixed;
+  top: 20px;
+  left: 30px;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 8px rgba(0,0,0,0.7);
+  z-index: 10;
+}
+
+/* ===================== */
+/* BLOC INFOS PRO DESIGN */
+/* ===================== */
+.project-info-block {
+  min-height: 100vh;
+  width: 100vw;
+  background: #111;
+  color: #fff;
+  padding: 70px 40px;
+  display: center;
+  flex-direction: column;
+  gap: 35px;
+  scroll-snap-align: start;
+}
+
+.project-info-block h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #ff6600;
+  font-weight: 700;
+}
+
+.info-card {
+  background: #1a1a1a;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.25);
+  border: 1px solid #222;
+  
+}
+
+.info-card h3 {
+  font-size: 1.4rem;
+  color: #ff6600;
+  margin-bottom: 15px;
+}
+
+.info-card p {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  color: #ddd;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 3px;
+}
+
+.info-value {
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.info-link {
+  color: #ff6600;
+  text-decoration: none;
+}
+.info-link:hover {
+  text-decoration: underline;
+}
+
+/* Auteur */
+.author-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.author-avatar {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ff6600;
+}
+
+.author-avatar.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.author-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.author-role {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.author-date {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 5px;
+}
+
+@media(max-width: 768px) {
+  .project-title-overlay {
+    font-size: 1.5rem;
+  }
+  .project-info-block {
+    padding: 50px 20px;
+  }
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<section class="project-fullscreen-page">
+
+  <!-- Titre flottant -->
+  <div class="project-title-overlay">{{ projet.title }}</div>
+
+  <div class="project-fullscreen-container">
+
+    <!-- ========================= -->
+    <!--    LISTE DES MÉDIAS      -->
+    <!-- ========================= -->
+    {% for media in projet.images.all %}
+      <div class="project-media-wrapper">
+        {% if media.image.url|lower|slice:"-4:" == ".mp4" %}
+          <video controls autoplay muted loop>
+            <source src="{{ media.image.url }}" type="video/mp4">
+          </video>
+        {% else %}
+          <img src="{{ media.image.url }}" alt="{{ projet.title }}">
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <!-- ========================= -->
+    <!--  📌 BLOC INFOS DU PROJET  -->
+    <!-- ========================= -->
+    <div class="project-info-block">
+
+      <h2>Informations du projet</h2>
+
+      <!-- DESCRIPTION -->
+      <div class="info-card">
+        <h3>Description</h3>
+        <p>{{ projet.description|linebreaksbr }}</p>
+      </div>
+
+      <!-- DETAILS -->
+      <div class="info-card">
+        <h3>Détails du projet</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Titre</span>
+            <span class="info-value">{{ projet.title }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Catégorie</span>
+            <span class="info-value">{{ projet.get_category_display }}</span>
+          </div>
+          {% if projet.technologies %}
+          <div class="info-item">
+            <span class="info-label">Technologies</span>
+            <span class="info-value">{{ projet.technologies }}</span>
+          </div>
+          {% endif %}
+          {% if projet.demo_link %}
+          <div class="info-item">
+            <span class="info-label">Lien Démo</span>
+            <span class="info-value">
+              <a href="{{ projet.demo_link }}" target="_blank" class="info-link">Voir la démo</a>
+            </span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- AUTEUR & DATE -->
+      <div class="info-card">
+        <h3>Auteur & Publication</h3>
+        <div class="author-box">
+          {% if projet.owner.photo_profil %}
+          <img src="{{ projet.owner.photo_profil.url }}" class="author-avatar" alt="">
+          {% else %}
+          <div class="author-avatar placeholder">{{ projet.owner.username|first|upper }}</div>
+          {% endif %}
+          <div>
+            <div class="author-name">{{ projet.owner.username }}</div>
+            <div class="author-role">{{ projet.owner.get_role_display }}</div>
+            <div class="author-date">Publié le {{ projet.created_at|date:"d M Y à H:i" }}</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- FIN infos -->
+
+  </div>
+
+</section>
+
+{% endblock %}

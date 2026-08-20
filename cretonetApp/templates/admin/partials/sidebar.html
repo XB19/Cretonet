@@ -1,0 +1,174 @@
+{% load static %}
+
+<aside class="admin-sidebar">
+
+    <!-- ===========================
+         LOGO
+    ============================ -->
+    <div class="admin-sidebar-top">
+
+        <a href="{% url 'admin_dashboard' %}" class="admin-brand">
+            <img src="{% static 'frontend/images/images/logo cretonet .png' %}"
+                 alt="Logo CreToNet">
+        </a>
+
+    </div>
+
+    <!-- ===========================
+         MENU
+    ============================ -->
+    <nav class="admin-menu">
+
+        <p class="menu-title">
+            Navigation
+        </p>
+
+        <!-- DASHBOARD -->
+        <a href="{% url 'admin_dashboard' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-table-columns"></i>
+            </span>
+
+            <span class="menu-text">
+                Dashboard
+            </span>
+
+        </a>
+
+        <!-- UTILISATEURS -->
+        <a href="{% url 'admin_user_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_user_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-users"></i>
+            </span>
+
+            <span class="menu-text">
+                Utilisateurs
+            </span>
+
+        </a>
+
+        <!-- PROJETS -->
+        <a href="{% url 'admin_project_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_project_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-diagram-project"></i>
+            </span>
+
+            <span class="menu-text">
+                Projets
+            </span>
+
+        </a>
+
+        <!-- OFFRES -->
+        <a href="{% url 'admin_offer_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_offer_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-briefcase"></i>
+            </span>
+
+            <span class="menu-text">
+                Offres
+            </span>
+
+        </a>
+
+        <!-- VALIDATIONS -->
+        <a href="{% url 'admin_validation_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_validation_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-circle-check"></i>
+            </span>
+
+            <span class="menu-text">
+                Validations
+            </span>
+
+        </a>
+
+        <!-- SIGNALEMENTS -->
+        <a href="{% url 'admin_report_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_report_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-flag"></i>
+            </span>
+
+            <span class="menu-text">
+                Signalements
+            </span>
+
+        </a>
+
+        <!-- MESSAGES -->
+        <a href="{% url 'admin_message_list' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_message_list' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-comments"></i>
+            </span>
+
+            <span class="menu-text">
+                Messages
+            </span>
+
+        </a>
+
+        <!-- STATISTIQUES -->
+        <a href="{% url 'admin_stats' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_stats' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-chart-line"></i>
+            </span>
+
+            <span class="menu-text">
+                Statistiques
+            </span>
+
+        </a>
+
+        <!-- PARAMÈTRES -->
+        <a href="{% url 'admin_settings' %}"
+           class="menu-item {% if request.resolver_match.url_name == 'admin_settings' %}active{% endif %}">
+
+            <span class="menu-icon">
+                <i class="fas fa-gear"></i>
+            </span>
+
+            <span class="menu-text">
+                Paramètres
+            </span>
+
+        </a>
+
+    </nav>
+
+    <!-- ===========================
+         BOTTOM / LOGOUT
+    ============================ -->
+    <div class="admin-sidebar-bottom">
+
+        <a href="{% url 'deconnexion' %}"
+           class="menu-item logout-btn">
+
+            <span class="menu-icon">
+                <i class="fas fa-right-from-bracket"></i>
+            </span>
+
+            <span class="menu-text">
+                Déconnexion
+            </span>
+
+        </a>
+
+    </div>
+
+</aside>

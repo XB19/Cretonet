@@ -1,0 +1,30 @@
+{% load static %}
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-col brand">
+      <h4>CreToNet</h4>
+      <p>Connecter les talents et les opportunités.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Talents Connect</h4>
+      <ul>
+        <li><a href="{% url 'home' %}">Accueil</a></li>
+        <li><a href="{% url 'prestataires_list' %}">Prestataires</a></li>
+        <li><a href="{% url 'offers_list' %}">Offres</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Ressources</h4>
+      <ul>
+        <li><a href="#">Conditions</a></li>
+        <li><a href="#">Confidentialité</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 <strong>CreToNet</strong> — Tous droits réservés.</p>
+  </div>
+</footer>

@@ -1,0 +1,453 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}
+Détail signalement
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+REPORT DETAIL PAGE (ALIGNÉ OFFER DETAIL STYLE)
+========================================================= */
+
+.report-detail-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* HEADER */
+.report-detail-header{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.report-detail-title{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+line-height:1.2;
+}
+
+.report-detail-subtitle{
+font-size:15px;
+color:#6b7280;
+line-height:1.7;
+max-width:760px;
+}
+
+/* STATS GRID */
+.report-detail-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:20px;
+}
+
+/* STAT CARD (SAME STYLE AS OFFER) */
+.detail-stat-card{
+background:#fff;
+border-radius:24px;
+padding:24px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 18px rgba(15,23,42,0.04);
+position:relative;
+overflow:hidden;
+transition:0.3s ease;
+}
+
+.detail-stat-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,#ff7a00,#ffb347);
+}
+
+.detail-stat-card:hover{
+transform:translateY(-4px);
+box-shadow:0 18px 35px rgba(15,23,42,0.08);
+}
+
+.detail-stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.detail-stat-label{
+font-size:14px;
+font-weight:600;
+color:#6b7280;
+}
+
+.detail-stat-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:rgba(255,122,0,0.10);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:#ff7a00;
+}
+
+.detail-stat-value{
+font-size:1.2rem;
+font-weight:800;
+color:#111827;
+line-height:1.4;
+word-break:break-word;
+}
+
+/* MAIN BOX */
+.report-detail-box{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+.report-detail-box-header{
+padding:28px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.report-detail-box-header h3{
+display:flex;
+align-items:center;
+gap:12px;
+font-size:1.15rem;
+font-weight:800;
+color:#111827;
+}
+
+/* CONTENT */
+.report-detail-content{
+padding:32px;
+display:flex;
+flex-direction:column;
+gap:30px;
+}
+
+/* GRID */
+.report-detail-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:22px;
+}
+
+.report-detail-item{
+background:#f8fafc;
+border-radius:20px;
+padding:22px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.report-detail-item-label{
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.4px;
+color:#6b7280;
+}
+
+.report-detail-item-value{
+font-size:15px;
+font-weight:600;
+color:#111827;
+line-height:1.7;
+}
+
+/* REASON BOX */
+.report-reason-box{
+background:#f8fafc;
+border-radius:24px;
+padding:28px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.report-reason-title{
+font-size:1rem;
+font-weight:800;
+color:#111827;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.report-reason-content{
+font-size:15px;
+line-height:1.9;
+color:#374151;
+white-space:pre-line;
+}
+
+/* STATUS BADGE */
+.status-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:10px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+width:fit-content;
+}
+
+.status-badge.pending{
+background:#fff7ed;
+color:#ea580c;
+}
+
+.status-badge.success{
+background:#dcfce7;
+color:#16a34a;
+}
+
+/* ACTIONS */
+.report-detail-actions{
+display:flex;
+gap:14px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+.detail-btn{
+height:48px;
+padding:0 22px;
+border-radius:14px;
+font-size:14px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+transition:0.25s ease;
+cursor:pointer;
+border:none;
+}
+
+.detail-btn.resolve{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.detail-btn.delete{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.detail-btn.back{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.detail-btn:hover{
+transform:translateY(-2px);
+}
+
+</style>
+
+<div class="report-detail-page">
+
+    <!-- HEADER -->
+    <div class="report-detail-header">
+
+        <h1 class="report-detail-title">
+            Détail du signalement
+        </h1>
+
+        <p class="report-detail-subtitle">
+            Analyse complète du contenu signalé sur la plateforme.
+        </p>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="report-detail-stats">
+
+        <!-- STATUS -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+                <span class="detail-stat-label">Statut</span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+            </div>
+
+            <div class="detail-stat-value">
+
+                {% if report.resolved %}
+
+                <span class="status-badge success">
+                    Résolu
+                </span>
+
+                {% else %}
+
+                <span class="status-badge pending">
+                    En attente
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- TYPE -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+                <span class="detail-stat-label">Type</span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+            </div>
+
+            <div class="detail-stat-value">
+                {{ report.get_report_type_display }}
+            </div>
+
+        </div>
+
+        <!-- DATE -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+                <span class="detail-stat-label">Date</span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+            </div>
+
+            <div class="detail-stat-value">
+                {{ report.created_at|date:"d/m/Y H:i" }}
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN BOX -->
+    <div class="report-detail-box">
+
+        <div class="report-detail-box-header">
+            <h3>
+                <i class="fas fa-circle-info"></i>
+                Informations du signalement
+            </h3>
+        </div>
+
+        <div class="report-detail-content">
+
+            <!-- GRID -->
+            <div class="report-detail-grid">
+
+                <!-- USER -->
+                <div class="report-detail-item">
+                    <span class="report-detail-item-label">Utilisateur</span>
+                    <span class="report-detail-item-value">
+                        {{ report.reporter.username }}
+                    </span>
+                </div>
+
+                <!-- EMAIL -->
+                <div class="report-detail-item">
+                    <span class="report-detail-item-label">Email</span>
+                    <span class="report-detail-item-value">
+                        {{ report.reporter.email }}
+                    </span>
+                </div>
+
+                <!-- TARGET -->
+                <div class="report-detail-item">
+                    <span class="report-detail-item-label">Contenu signalé</span>
+
+                    <span class="report-detail-item-value">
+
+                        {% if report.project %}
+                            Projet : {{ report.project.title }}
+                        {% elif report.offer %}
+                            Offre : {{ report.offer.title }}
+                        {% else %}
+                            Inconnu
+                        {% endif %}
+
+                    </span>
+                </div>
+
+            </div>
+
+            <!-- REASON -->
+            <div class="report-reason-box">
+
+                <div class="report-reason-title">
+                    <i class="fas fa-comment-dots"></i>
+                    Motif du signalement
+                </div>
+
+                <div class="report-reason-content">
+                    {{ report.reason }}
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="report-detail-actions">
+
+                {% if not report.resolved %}
+
+                <a href="{% url 'resolve_report' report.id %}"
+                   class="detail-btn resolve">
+
+                    ✔ Marquer résolu
+                </a>
+
+                {% endif %}
+
+                <a href="{% url 'delete_report' report.id %}"
+                   class="detail-btn delete"
+                   onclick="return confirm('Supprimer ce signalement ?');">
+
+                    🗑 Supprimer
+                </a>
+
+                <a href="{% url 'admin_report_list' %}"
+                   class="detail-btn back">
+
+                    ⬅ Retour
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+<header class="admin-topbar">
+
+    <div class="topbar-left">
+        <div>
+            <h2 class="topbar-title">
+                {% block admin_title %}Dashboard{% endblock %}
+            </h2>
+
+            <p class="topbar-subtitle">
+                Administration CreToNet
+            </p>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+
+        <button class="topbar-icon-btn">
+            <i class="fas fa-bell"></i>
+        </button>
+
+        <div class="topbar-user">
+
+            <div class="topbar-user-avatar">
+                A
+            </div>
+
+            <div class="topbar-user-info">
+                <h4>{{ request.user.username }}</h4>
+                <span>Administrateur</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</header>

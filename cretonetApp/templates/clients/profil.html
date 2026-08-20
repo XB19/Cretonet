@@ -1,0 +1,1239 @@
+{% extends "clients/base.html" %}
+{% load static %}
+
+{% block title %}Profil - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ====== PAGE PROFIL ====== */
+.profile-page {
+  min-height: 100vh;
+  padding: 40px 25px;
+  background: #f9f9f9;
+}
+
+/* ====== LAYOUT PRINCIPAL ====== */
+.profile-container {
+  display: flex;
+  gap: 30px; 
+  align-items: flex-start;
+  justify-content: center;
+  /* flex-wrap: wrap; <-- supprimez ça pour éviter que la sidebar et les projets se cassent */
+}
+
+/* ===== SIDEBAR ===== */
+.profile-sidebar {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Photo ronde */
+.profile-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #f2f2f2;
+  background: #ddd url("{% static 'images/default-avatar.png' %}") center/cover no-repeat;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-name {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-name h2 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.profile-name span {
+  display: block;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* Boutons */
+.profile-buttons {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.profile-btn {
+  display: block;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.btn-edit {
+  background: #ff6600;
+  color: #fff;
+}
+.btn-edit:hover { background: #278b05; }
+
+.btn-add {
+  background: #f0f0f0;
+  color: #333;
+}
+.btn-add:hover { background: #e6e6e6; }
+
+/* À propos */
+.about-box {
+  background: #fafafa;
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 14px;
+  margin-top: 30px;
+  width: 100%;
+}
+
+.about-box h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.about-box p {
+  font-size: 0.92rem;
+  color: #444;
+  line-height: 1.45;
+  text-align: justify;
+}
+
+/* Logout */
+.logout-btn {
+  margin-top: 25px;
+  display: block;
+  padding: 12px;
+  text-align: center;
+  background: #ff0000;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  width: 100%;
+}
+.logout-btn:hover { background: #e55a00; }
+
+/* ===== PROJETS ===== */
+.user-projects {
+  flex: 1;
+  width: 100%;
+}
+
+/* Onglets Projets / Brouillons */
+.project-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.project-tab {
+  padding: 10px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #f0f0f0;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.project-tab.active {
+  background: #ff6600;
+  color: #fff;
+}
+
+/* Grille projets - 3 par ligne et plus grandes */
+.project-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+/* Carte projet - un peu plus grande */
+.project-mini-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 240px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-mini-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.12);
+}
+
+.project-mini-thumb {
+  height: 140px;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  overflow: hidden;
+}
+
+/* Vidéo dans la carte projet */
+.project-mini-thumb video {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+/* Info projet */
+.project-mini-info {
+  padding: 10px 12px;
+  flex: 1;
+}
+
+.project-mini-info h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-mini-info p {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* Séparateur */
+.profile-separator {
+  width: 2px;
+  background: #e0e0e0;
+  border-radius: 1px;
+  margin: 0 15px;
+}
+
+/* Responsive - une colonne sur petit écran */
+@media(max-width:992px) {
+  .project-mini-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media(max-width:600px) {
+  .project-mini-grid { grid-template-columns: 1fr; }
+}
+
+.offer-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: 0.25s ease;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+}
+
+.offer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.offer-thumb {
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+}
+
+.offer-info {
+  padding: 12px;
+}
+
+.offer-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #222;
+}
+
+.offer-category,
+.offer-location,
+.offer-price,
+.offer-desc {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.offer-desc {
+  font-size: .85rem;
+  color: #444;
+  line-height: 1.45;
+  margin-bottom: .9rem;
+
+  display: -webkit-box;       /* nécessaire pour limiter en lignes */
+  -webkit-line-clamp: 3;      /* nombre de lignes affichées */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* GRID */
+.offer-grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+/* CARD */
+.offer-card-text {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.3rem;
+  border: 1px solid #eee;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: all .25s ease;
+}
+
+.offer-card-text:hover {
+  border-color: #ff6600;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+/* HEADER */
+.offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .8rem;
+  margin-bottom: .6rem;
+}
+
+.offer-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* BADGE */
+.offer-badge {
+  background: #ff6600;
+  color: #fff;
+  font-size: .7rem;
+  padding: 4px 10px;
+  border-radius: 30px;
+  white-space: nowrap;
+}
+
+/* INFOS */
+.offer-infos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: .8rem;
+  color: #555;
+  margin-bottom: .7rem;
+}
+
+.offer-info-item {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.offer-info-item i {
+  color: #ff6600;
+}
+
+/* DESCRIPTION */
+.offer-desc {
+    font-size: 0.85rem;
+    color: #444;
+    line-height: 1.45;
+    margin-bottom: 0.9rem;
+
+    display: -webkit-box;       
+    -webkit-line-clamp: 3;      
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.offer-footer .offer-cta i {
+    margin-left: 6px;
+}
+
+
+/* FOOTER */
+.offer-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.offer-cta {
+  font-size: .8rem;
+  font-weight: 600;
+  color: #1500ff;
+  transition: transform .2s ease;
+}
+
+.offer-card-text:hover .offer-cta {
+  transform: translateX(6px);
+}
+
+/* EMPTY */
+.empty-text {
+  font-size: .85rem;
+  color: #777;
+}
+
+/* DRAFT */
+.draft-card {
+  border: 2px dashed #ff6600;
+  box-shadow: none;
+}
+
+.draft-badge {
+  background: #fff;
+  color: #ff6600;
+  border: 1px solid #ff6600;
+}
+
+.draft-label {
+  font-size: .75rem;
+  font-weight: 600;
+  color: #ff6600;
+  margin-top: .8rem;
+}
+
+/* Brouillon */
+.draft-card {
+  border: 2px dashed #ff6600;
+}
+
+/* Label brouillon */
+.draft-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ff6600;
+  display: block;
+  margin-top: 5px;
+}
+
+/* Bouton continuer */
+.btn-continue {
+  margin-top: 8px;
+  display: inline-block;
+  background: #28a745;
+  color: white;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-continue:hover {
+  background: #218838;
+}
+
+/* Alignement */
+.draft-actions {
+  margin-top: 6px;
+}
+
+/* MENU 3 POINTS */
+.project-menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.menu-btn {
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: column;
+  min-width: 140px;
+  z-index: 999;
+}
+
+.menu-dropdown a {
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.menu-dropdown a:hover {
+  background: #f5f5f5;
+}
+
+.menu-delete {
+  color: red;
+}
+
+/* IMPORTANT */
+.project-mini-card {
+  position: relative;
+}
+
+/* MENU 3 POINTS (pour projets et offres) */
+.project-menu {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.menu-btn {
+  background: rgba(255,255,255,0.9);
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: column;
+  min-width: 140px;
+  z-index: 999;
+}
+
+.menu-dropdown a {
+  padding: 10px 14px;
+  text-decoration: none;
+  color: #333;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.menu-dropdown a:hover {
+  background: #f5f5f5;
+}
+
+.menu-delete {
+  color: red;
+}
+
+.report-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:99999;
+    justify-content:center;
+    align-items:center;
+}
+
+.report-box{
+    background:#fff;
+    width:420px;
+    max-width:95%;
+    border-radius:16px;
+    padding:20px;
+    animation:zoomIn .2s ease;
+}
+
+.report-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.report-header h3{
+    margin:0;
+    font-size:1.1rem;
+}
+
+.report-header span{
+    cursor:pointer;
+    font-size:20px;
+}
+
+.report-box textarea{
+    width:100%;
+    min-height:120px;
+    border:1px solid #ddd;
+    border-radius:10px;
+    padding:12px;
+    resize:none;
+}
+
+.report-box button{
+    margin-top:15px;
+    width:100%;
+    border:none;
+    background:#ff6600;
+    color:white;
+    padding:12px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+.report-box button:hover{
+    background:#e65c00;
+}
+
+@keyframes zoomIn{
+    from{
+        transform:scale(.9);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 320px;
+}
+
+/* Base alert */
+.alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+    animation: slideIn 0.3s ease-out;
+    color: #fff;
+}
+
+/* SUCCESS */
+.alert.success {
+    background: #22c55e; /* vert moderne */
+}
+
+/* ERROR */
+.alert.error {
+    background: #ef4444; /* rouge moderne */
+}
+
+/* WARNING */
+.alert.warning {
+    background: #f59e0b; /* orange */
+}
+
+/* INFO */
+.alert.info {
+    background: #3b82f6; /* bleu */
+}
+
+/* Animation entrée */
+@keyframes slideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Animation sortie légère (option UX) */
+.alert {
+    animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-out 4s forwards;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(120%);
+    }
+}
+
+@media (max-width: 768px) {
+    .messages {
+        right: 10px;
+        left: 10px;
+        top: 10px;
+        max-width: 100%;
+    }
+}
+
+</style>
+
+<section class="profile-page">
+  <div class="profile-container">
+
+    <!-- SIDEBAR -->
+    <div class="profile-sidebar">
+      <div class="profile-photo">
+        {% if user.photo_profil %}
+          <img src="{{ user.photo_profil.url }}" alt="{{ user.username }}">
+        {% endif %}
+      </div>
+
+      <div class="profile-name">
+        <h2>{{ user.username }}</h2>
+        <span>Membre depuis {{ user.date_inscription|date:"F Y" }}</span>
+      </div>
+
+      <div class="profile-buttons">
+
+        {% if is_owner %}
+
+          <!-- PRESTATAIRE -->
+          {% if user.role == "designer" or user.role == "developpeur" %}
+            <a href="{% url 'modifier_profil' %}" class="profile-btn btn-edit">
+              Modifier mon profil
+            </a>
+            <a href="{% url 'add_project' %}" class="profile-btn btn-add">
+              Publier un projet
+            </a>
+          {% endif %}
+
+          <!-- RECRUTEUR -->
+          {% if user.role == "recruteur" %}
+            <a href="{% url 'modifier_profil' %}" class="profile-btn btn-edit">
+              Modifier mon profil
+            </a>
+            <a href="{% url 'publish_offer' %}" class="profile-btn btn-add">
+              Publier une offre
+            </a>
+          {% endif %}
+
+        {% else %}
+
+          <!-- VISITEUR -->
+          <a href="{% url 'messagerie' user.id_utilisateur %}" class="profile-btn btn-add">
+            Discuter
+          </a>
+
+        {% endif %}
+
+      </div>
+
+
+
+      <div class="about-box">
+        <h4>À propos de moi</h4>
+        {% if user.bio %}
+          <p>{{ user.bio }}</p>
+        {% else %}
+          <p style="color:#777;">Aucune description ajoutée.</p>
+        {% endif %}
+      </div>
+
+      {% if is_owner %}
+        <a href="{% url 'deconnexion' %}" class="logout-btn">Se déconnecter</a>
+      {% endif %}
+    </div>
+
+    <!-- Séparateur -->
+    <div class="profile-separator"></div>
+
+    <!-- PROJETS / BROUILLONS -->
+    <div class="user-projects">
+      <!-- Onglets -->
+<div class="project-tabs">
+  {% if user.role == "designer" or user.role == "developpeur" %}
+    <div class="project-tab active" data-tab="projects">Projets</div>
+    {% if is_owner %}
+      <div class="project-tab" data-tab="drafts">Brouillons</div>
+    {% endif %}
+  {% elif user.role == "recruteur" %}
+    <div class="project-tab active" data-tab="offers">Offres</div>
+    {% if is_owner %}
+      <div class="project-tab" data-tab="drafts">Brouillons</div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<!-- Contenu Onglets -->
+<div class="tab-content">
+  {% if user.role == "designer" or user.role == "developpeur" %}
+    <!-- Projets -->
+    <div class="tab-pane active" id="projects">
+      {% if projets %}
+<div class="project-mini-grid">
+  {% for p in projets %}
+    <div class="project-mini-card">
+<div class="project-menu">
+  <button class="menu-btn" onclick="toggleMenu(this)">⋮</button>
+
+  <div class="menu-dropdown">
+
+    {% if is_owner %}
+      <a href="{% url 'edit_project' p.id %}">Modifier</a>
+      <a href="{% url 'delete_project' p.id %}"
+         class="menu-delete"
+         onclick="return confirm('Supprimer ce projet ?');">
+         Supprimer
+      </a>
+
+      <a href="#" onclick="shareProject('{% url 'project_detail' p.id %}')">
+         Partager
+      </a>
+
+    {% else %}
+      <a href="#"
+         onclick="openReportModal('project', '{{ p.id }}')">
+         🚩 Signaler
+      </a>
+    {% endif %}
+
+  </div>
+</div><div class="project-menu">
+  <button class="menu-btn" onclick="toggleMenu(this)">⋮</button>
+
+  <div class="menu-dropdown">
+
+    {% if is_owner %}
+      <a href="{% url 'edit_project' p.id %}">Modifier</a>
+      <a href="{% url 'delete_project' p.id %}"
+         class="menu-delete"
+         onclick="return confirm('Supprimer ce projet ?');">
+         Supprimer
+      </a>
+
+      <a href="#" onclick="shareProject('{% url 'project_detail' p.id %}')">
+         Partager
+      </a>
+
+    {% else %}
+      <a href="#"
+         onclick="openReportModal('project', '{{ p.id }}')">
+         🚩 Signaler
+      </a>
+    {% endif %}
+
+  </div>
+</div>
+      <a href="{% url 'project_detail' p.id %}">
+        {% with first_media=p.images.first %}
+          {% if first_media %}
+            {% if first_media.image.url|slice:"-4:" == ".mp4" %}
+              <div class="project-mini-thumb">
+                <video muted loop poster="{% static 'images/video_placeholder.jpg' %}">
+                  <source src="{{ first_media.image.url }}" type="video/mp4">
+                </video>
+              </div>
+            {% else %}
+              <div class="project-mini-thumb" style="background-image:url('{{ first_media.image.url }}');"></div>
+            {% endif %}
+          {% else %}
+            <div class="project-mini-thumb" style="background-image:url('{% static 'images/default_project.jpg' %}');"></div>
+          {% endif %}
+        {% endwith %}
+        <div class="project-mini-info">
+          <h4>{{ p.title }}</h4>
+          <p>{{ p.get_category_display }}</p>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+      {% else %}
+        <p>Aucun projet soumis pour le moment.</p>
+      {% endif %}
+    </div>
+
+    {% if is_owner %}
+      <!-- Brouillons -->
+<div class="tab-pane" id="drafts" style="display:none;">
+  {% if brouillons_projets %}
+    <div class="project-mini-grid">
+
+      {% for p in brouillons_projets %}
+      <div class="project-mini-card draft-card">
+
+        <!-- IMAGE -->
+        <div class="project-mini-thumb"
+             style="background-image:url('{% static 'images/default_project.jpg' %}');">
+        </div>
+
+        <!-- INFOS -->
+        <div class="project-mini-info">
+          <h4>{{ p.title }}</h4>
+          <p>{{ p.get_category_display }}</p>
+
+          <span class="draft-label">
+            Brouillon
+          </span>
+
+          <div class="draft-actions">
+            <a href="{% url 'edit_project' p.id %}" class="btn-continue">
+              Continuer
+            </a>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+  {% else %}
+    <p class="empty-text">Aucun brouillon pour le moment.</p>
+  {% endif %}
+</div>
+    {% endif %}
+
+{% elif user.role == "recruteur" %}
+
+<!-- OFFRES -->
+<div class="tab-pane active" id="offers">
+
+  {% if offres %}
+  <div class="project-mini-grid offer-grid">
+
+    {% for o in offres %}
+    <div class="offer-card-text">
+
+      <!-- Header -->
+<div class="project-menu">
+  <button class="menu-btn" onclick="toggleMenu(this)">⋮</button>
+
+  <div class="menu-dropdown">
+
+    {% if is_owner %}
+
+      <a href="{% url 'edit_offer' o.id %}">Modifier</a>
+
+      <a href="{% url 'delete_offer' o.id %}"
+         class="menu-delete">
+         Supprimer
+      </a>
+
+      <a href="#"
+         onclick="shareOffer('{% url 'offer_detail' o.id %}')">
+         Partager
+      </a>
+
+    {% else %}
+
+      <a href="#"
+         onclick="openReportModal('offer', '{{ o.id }}')">
+         🚩 Signaler
+      </a>
+
+    {% endif %}
+
+  </div>
+
+  
+</div>
+      <div class="offer-header">
+        <h4 class="offer-title">{{ o.title }}</h4>
+        <span class="offer-badge">{{ o.get_category_display }}</span>
+      </div>
+
+      <!-- Infos clés -->
+      <div class="offer-infos">
+
+        {% if o.location %}
+        <div class="offer-info-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{ o.location }}</span>
+        </div>
+        {% endif %}
+
+        <div class="offer-info-item">
+          <i class="fas fa-briefcase"></i>
+          <span>{{ o.get_work_mode_display }}</span>
+        </div>
+
+        <div class="offer-info-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Deadline : {{ o.deadline|date:"d M Y" }}</span>
+        </div>
+
+      </div>
+
+      <!-- Description (début seulement) -->
+      {% if o.description %}
+      <p class="offer-desc">
+        {{ o.description|truncatechars:180 }}
+      </p>
+      {% endif %}
+
+      <!-- Footer -->
+      <div class="offer-footer">
+
+        <!-- Voir l'offre (visible à tous) -->
+        <a href="{% url 'offer_detail' o.id %}" class="offer-cta primary">
+          Voir l’offre <i class="fas fa-arrow-right"></i>
+        </a>
+
+        {% if is_owner %}
+        <div class="offer-actions">
+
+          <a href="{% url 'edit_offer' o.id %}" class="offer-cta edit">
+            <i class="fas fa-edit"></i>
+          </a>
+
+          <a href="{% url 'delete_offer' o.id %}" 
+             class="offer-cta delete"
+             onclick="return confirm('Voulez-vous vraiment supprimer cette offre ?');">
+            <i class="fas fa-trash"></i>
+          </a>
+
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+    {% endfor %}
+
+  </div>
+  {% else %}
+  <p class="empty-text">Aucune offre publiée pour le moment.</p>
+  {% endif %}
+
+</div>
+
+
+
+{% if is_owner %}
+<!-- BROUILLONS -->
+<div class="tab-pane" id="drafts" style="display:none;">
+
+  {% if brouillons_offres %}
+    <div class="project-mini-grid offer-grid">
+
+{% for b in brouillons_offres %}
+<div class="offer-card-text draft-card">
+
+  <div class="offer-header">
+    <h4 class="offer-title">{{ b.title }}</h4>
+    <span class="offer-badge draft-badge">
+      {{ b.get_category_display }}
+    </span>
+  </div>
+
+  <p class="draft-label">Brouillon</p>
+
+  <div class="draft-actions">
+    <a href="{% url 'edit_offer' b.id %}" class="btn-continue">
+      Continuer
+    </a>
+  </div>
+
+</div>
+{% endfor %}
+
+    </div>
+  {% else %}
+    <p class="empty-text">Aucun brouillon pour le moment.</p>
+  {% endif %}
+
+</div>
+{% endif %}
+
+{% endif %}
+
+</div>
+
+
+
+    </div>
+  </div>
+
+<div class="report-modal" id="reportModal">
+
+    <div class="report-box">
+
+        <div class="report-header">
+            <h3>Signaler un contenu</h3>
+            <span onclick="closeReportModal()">✕</span>
+        </div>
+
+        <form method="POST" action="{% url 'create_report' %}">
+            {% csrf_token %}
+
+            <!-- TYPE -->
+            <input type="hidden" name="report_type" id="reportType">
+
+            <!-- OFFRE -->
+            <input type="hidden" name="offer_id" id="offerId">
+
+            <!-- PROJET -->
+            <input type="hidden" name="project_id" id="projectId">
+
+            <textarea
+                name="reason"
+                required
+                placeholder="Expliquez brièvement le problème..."></textarea>
+
+            <button type="submit">
+                Envoyer le signalement
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert {{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+</div>
+</section>
+
+<script>
+
+// Onglets
+const tabs = document.querySelectorAll('.project-tab');
+const panes = document.querySelectorAll('.tab-pane');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+
+    const target = tab.dataset.tab;
+    panes.forEach(p => {
+      p.style.display = p.id === target ? 'block' : 'none';
+    });
+  });
+});
+
+// MENU 3 POINTS
+function toggleMenu(button) {
+  event.stopPropagation();
+
+  const menu = button.nextElementSibling;
+
+  document.querySelectorAll('.menu-dropdown').forEach(m => {
+    if (m !== menu) m.style.display = 'none';
+  });
+
+  menu.style.display = menu.style.display === 'block'
+    ? 'none'
+    : 'block';
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-dropdown').forEach(m => {
+    m.style.display = 'none';
+  });
+});
+
+// PARTAGE
+function shareProject(url) {
+  navigator.clipboard.writeText(window.location.origin + url);
+  alert("Lien copié !");
+}
+
+// MENU 3 POINTS
+function toggleMenu(button) {
+  event.stopPropagation();
+
+  const menu = button.nextElementSibling;
+
+  document.querySelectorAll('.menu-dropdown').forEach(m => {
+    if (m !== menu) m.style.display = 'none';
+  });
+
+  menu.style.display = menu.style.display === 'block'
+    ? 'none'
+    : 'block';
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.menu-dropdown').forEach(m => {
+    m.style.display = 'none';
+  });
+});
+
+// PARTAGE
+function shareOffer(url) {
+  navigator.clipboard.writeText(window.location.origin + url);
+  alert("Lien copié !");
+}
+
+function openReportModal(type, id) {
+
+    document.getElementById('reportType').value = type;
+
+    // reset
+    document.getElementById('offerId').value = "";
+    document.getElementById('projectId').value = "";
+
+    if (type === "offer") {
+        document.getElementById('offerId').value = id;
+    }
+
+    if (type === "project") {
+        document.getElementById('projectId').value = id;
+    }
+
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+}
+</script>
+
+{% endblock %}

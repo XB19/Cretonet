@@ -1,0 +1,815 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}
+Détail projet
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+PROJECT DETAIL PAGE
+========================================================= */
+
+.project-detail-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* =========================================================
+HEADER
+========================================================= */
+
+.project-detail-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.project-detail-left{
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.project-detail-title{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+line-height:1.2;
+}
+
+.project-detail-subtitle{
+font-size:15px;
+color:#6b7280;
+line-height:1.7;
+max-width:760px;
+}
+
+/* =========================================================
+TOP CARDS
+========================================================= */
+
+.project-detail-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:20px;
+}
+
+.detail-stat-card{
+background:#fff;
+border-radius:24px;
+padding:24px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 18px rgba(15,23,42,0.04);
+position:relative;
+overflow:hidden;
+transition:0.3s ease;
+}
+
+.detail-stat-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,#ff7a00,#ffb347);
+}
+
+.detail-stat-card:hover{
+transform:translateY(-4px);
+box-shadow:0 18px 35px rgba(15,23,42,0.08);
+}
+
+.detail-stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.detail-stat-label{
+font-size:14px;
+font-weight:600;
+color:#6b7280;
+}
+
+.detail-stat-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:rgba(255,122,0,0.10);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:#ff7a00;
+}
+
+.detail-stat-value{
+font-size:1.2rem;
+font-weight:800;
+color:#111827;
+line-height:1.4;
+word-break:break-word;
+}
+
+/* =========================================================
+MAIN BOX
+========================================================= */
+
+.project-detail-box{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+.project-detail-box-header{
+padding:28px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.project-detail-box-header h3{
+display:flex;
+align-items:center;
+gap:12px;
+font-size:1.15rem;
+font-weight:800;
+color:#111827;
+}
+
+.project-detail-box-header h3 i{
+color:#ff7a00;
+}
+
+/* =========================================================
+CONTENT
+========================================================= */
+
+.project-detail-content{
+padding:32px;
+display:flex;
+flex-direction:column;
+gap:30px;
+}
+
+/* =========================================================
+GRID
+========================================================= */
+
+.project-detail-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:22px;
+}
+
+.project-detail-item{
+background:#f8fafc;
+border-radius:20px;
+padding:22px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+.project-detail-item-label{
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.4px;
+color:#6b7280;
+}
+
+.project-detail-item-value{
+font-size:15px;
+font-weight:600;
+color:#111827;
+line-height:1.7;
+word-break:break-word;
+}
+
+/* =========================================================
+STATUS BADGE
+========================================================= */
+
+.status-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:10px 16px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+width:fit-content;
+}
+
+.status-badge.pending{
+background:#fff7ed;
+color:#ea580c;
+}
+
+.status-badge.approved{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.status-badge.rejected{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.status-badge.draft{
+background:#f3f4f6;
+color:#4b5563;
+}
+
+/* =========================================================
+DESCRIPTION
+========================================================= */
+
+.project-description-box{
+background:#f8fafc;
+border-radius:24px;
+padding:28px;
+border:1px solid #eef2f7;
+display:flex;
+flex-direction:column;
+gap:18px;
+}
+
+.project-description-title{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:1rem;
+font-weight:800;
+color:#111827;
+}
+
+.project-description-title i{
+color:#ff7a00;
+}
+
+.project-description-content{
+font-size:15px;
+line-height:1.9;
+color:#374151;
+white-space:pre-line;
+}
+
+/* =========================================================
+TECHNOLOGIES
+========================================================= */
+
+.tech-list{
+display:flex;
+flex-wrap:wrap;
+gap:12px;
+}
+
+.tech-badge{
+padding:10px 16px;
+border-radius:999px;
+background:#fff7ed;
+color:#ea580c;
+font-size:13px;
+font-weight:700;
+border:1px solid #fed7aa;
+}
+
+/* =========================================================
+PROJECT IMAGES
+========================================================= */
+
+.project-images-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:18px;
+}
+
+.project-image-card{
+border-radius:22px;
+overflow:hidden;
+border:1px solid #eef2f7;
+background:#fff;
+box-shadow:0 4px 15px rgba(15,23,42,0.04);
+}
+
+.project-image-card img{
+width:100%;
+height:220px;
+object-fit:cover;
+display:block;
+}
+
+/* =========================================================
+DEMO LINK
+========================================================= */
+
+.demo-link-box{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:18px;
+flex-wrap:wrap;
+padding:22px;
+border-radius:20px;
+background:#eff6ff;
+border:1px solid #bfdbfe;
+}
+
+.demo-link-left{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.demo-link-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+color:#2563eb;
+}
+
+.demo-link-text{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+.demo-link-text strong{
+font-size:15px;
+color:#111827;
+}
+
+.demo-link-text span{
+font-size:13px;
+color:#6b7280;
+}
+
+.demo-btn{
+height:46px;
+padding:0 22px;
+border-radius:14px;
+background:#2563eb;
+color:#fff;
+font-size:14px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+transition:0.25s ease;
+}
+
+.demo-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 24px rgba(37,99,235,0.20);
+}
+
+/* =========================================================
+ACTIONS
+========================================================= */
+
+.project-detail-actions{
+display:flex;
+align-items:center;
+gap:14px;
+flex-wrap:wrap;
+padding-top:5px;
+}
+
+.detail-btn{
+height:48px;
+padding:0 22px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+gap:10px;
+text-decoration:none;
+transition:0.25s ease;
+cursor:pointer;
+}
+
+.detail-btn.back{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.detail-btn.delete{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.detail-btn:hover{
+transform:translateY(-2px);
+}
+
+/* =========================================================
+RESPONSIVE
+========================================================= */
+
+@media(max-width:768px){
+
+.project-detail-title{
+font-size:1.7rem;
+}
+
+.project-detail-content{
+padding:22px;
+}
+
+.project-detail-box-header{
+padding:22px;
+}
+
+.project-detail-grid{
+grid-template-columns:1fr;
+}
+
+.project-image-card img{
+height:180px;
+}
+
+}
+
+</style>
+
+<div class="project-detail-page">
+
+    <!-- HEADER -->
+    <div class="project-detail-header">
+
+        <div class="project-detail-left">
+
+            <h1 class="project-detail-title">
+                Détail du projet
+            </h1>
+
+            <p class="project-detail-subtitle">
+                Consultez toutes les informations liées à ce projet
+                publié sur la plateforme CreToNet.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="project-detail-stats">
+
+        <!-- CATEGORY -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Catégorie
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ project.get_category_display }}
+            </div>
+
+        </div>
+
+        <!-- OWNER -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Créateur
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ project.owner.username }}
+            </div>
+
+        </div>
+
+        <!-- STATUS -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Statut
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+
+                {% if project.status == 'published' %}
+
+                <span class="status-badge approved">
+                    Publié
+                </span>
+
+                {% elif project.status == 'pending' %}
+
+                <span class="status-badge pending">
+                    En attente
+                </span>
+
+                {% elif project.status == 'rejected' %}
+
+                <span class="status-badge rejected">
+                    Refusé
+                </span>
+
+                {% else %}
+
+                <span class="status-badge draft">
+                    Brouillon
+                </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- DATE -->
+        <div class="detail-stat-card">
+
+            <div class="detail-stat-top">
+
+                <span class="detail-stat-label">
+                    Date création
+                </span>
+
+                <div class="detail-stat-icon">
+                    <i class="fas fa-calendar-days"></i>
+                </div>
+
+            </div>
+
+            <div class="detail-stat-value">
+                {{ project.created_at|date:"d/m/Y" }}
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MAIN BOX -->
+    <div class="project-detail-box">
+
+        <div class="project-detail-box-header">
+
+            <h3>
+                <i class="fas fa-diagram-project"></i>
+                Informations du projet
+            </h3>
+
+        </div>
+
+        <div class="project-detail-content">
+
+            <!-- GRID -->
+            <div class="project-detail-grid">
+
+                <!-- TITLE -->
+                <div class="project-detail-item">
+
+                    <span class="project-detail-item-label">
+                        Titre
+                    </span>
+
+                    <div class="project-detail-item-value">
+                        {{ project.title }}
+                    </div>
+
+                </div>
+
+                <!-- OWNER -->
+                <div class="project-detail-item">
+
+                    <span class="project-detail-item-label">
+                        Propriétaire
+                    </span>
+
+                    <div class="project-detail-item-value">
+                        {{ project.owner.username }}
+                    </div>
+
+                </div>
+
+                <!-- CATEGORY -->
+                <div class="project-detail-item">
+
+                    <span class="project-detail-item-label">
+                        Catégorie
+                    </span>
+
+                    <div class="project-detail-item-value">
+                        {{ project.get_category_display }}
+                    </div>
+
+                </div>
+
+                <!-- CREATED -->
+                <div class="project-detail-item">
+
+                    <span class="project-detail-item-label">
+                        Créé le
+                    </span>
+
+                    <div class="project-detail-item-value">
+                        {{ project.created_at|date:"d/m/Y H:i" }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- TECHNOLOGIES -->
+            <div class="project-description-box">
+
+                <div class="project-description-title">
+
+                    <i class="fas fa-code"></i>
+
+                    Technologies utilisées
+
+                </div>
+
+                {% if project.technologies %}
+
+                <div class="tech-list">
+
+                    {% for tech in project.technologies.split|default:project.technologies %}
+
+                    <span class="tech-badge">
+                        {{ tech }}
+                    </span>
+
+                    {% endfor %}
+
+                </div>
+
+                {% else %}
+
+                <div class="project-description-content">
+                    Aucune technologie renseignée.
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            <!-- DEMO LINK -->
+            {% if project.demo_link %}
+
+            <div class="demo-link-box">
+
+                <div class="demo-link-left">
+
+                    <div class="demo-link-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+
+                    <div class="demo-link-text">
+
+                        <strong>
+                            Démonstration du projet
+                        </strong>
+
+                        <span>
+                            Ouvrir le lien de démonstration du projet
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <a href="{{ project.demo_link }}"
+                   target="_blank"
+                   class="demo-btn">
+
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                    Voir le projet
+
+                </a>
+
+            </div>
+
+            {% endif %}
+
+            <!-- DESCRIPTION -->
+            <div class="project-description-box">
+
+                <div class="project-description-title">
+
+                    <i class="fas fa-align-left"></i>
+
+                    Description du projet
+
+                </div>
+
+                <div class="project-description-content">
+                    {{ project.description }}
+                </div>
+
+            </div>
+
+            <!-- IMAGES -->
+            {% if project.images.all %}
+
+            <div class="project-description-box">
+
+                <div class="project-description-title">
+
+                    <i class="fas fa-image"></i>
+
+                    Aperçu du projet
+
+                </div>
+
+                <div class="project-images-grid">
+
+                    {% for image in project.images.all %}
+
+                    <div class="project-image-card">
+
+                        <img src="{{ image.image.url }}"
+                             alt="{{ project.title }}">
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+            <!-- ACTIONS -->
+            <div class="project-detail-actions">
+
+                <a href="{% url 'admin_project_delete' project.pk %}"
+                   class="detail-btn delete"
+                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce projet ?');">
+
+                    <i class="fas fa-trash"></i>
+                    Supprimer
+
+                </a>
+
+                <a href="{% url 'admin_validation_list' %}"
+                   class="detail-btn back">
+
+                    <i class="fas fa-arrow-left"></i>
+                    Retour à la liste
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

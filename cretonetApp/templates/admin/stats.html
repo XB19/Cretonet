@@ -1,0 +1,202 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Statistiques – Admin CreToNet
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+
+    <div>
+        <h1 class="page-title">
+            Statistiques
+        </h1>
+
+        <p class="page-subtitle">
+            Vue globale des statistiques de la plateforme.
+        </p>
+    </div>
+
+</div>
+
+<!-- CARTES STATS -->
+<div class="admin-cards">
+
+    <!-- UTILISATEURS -->
+    <div class="admin-card stat-card">
+
+        <div class="stat-card-top">
+
+            <span class="stat-label">
+                Utilisateurs
+            </span>
+
+            <span class="stat-icon">
+                <i class="fas fa-users"></i>
+            </span>
+
+        </div>
+
+        <h2 class="stat-number">
+            {{ total_users }}
+        </h2>
+
+    </div>
+
+    <!-- PROJETS -->
+    <div class="admin-card stat-card">
+
+        <div class="stat-card-top">
+
+            <span class="stat-label">
+                Projets
+            </span>
+
+            <span class="stat-icon">
+                <i class="fas fa-diagram-project"></i>
+            </span>
+
+        </div>
+
+        <h2 class="stat-number">
+            {{ total_projects }}
+        </h2>
+
+    </div>
+
+    <!-- OFFRES -->
+    <div class="admin-card stat-card">
+
+        <div class="stat-card-top">
+
+            <span class="stat-label">
+                Offres
+            </span>
+
+            <span class="stat-icon">
+                <i class="fas fa-briefcase"></i>
+            </span>
+
+        </div>
+
+        <h2 class="stat-number">
+            {{ total_offers }}
+        </h2>
+
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="admin-card stat-card">
+
+        <div class="stat-card-top">
+
+            <span class="stat-label">
+                Messages
+            </span>
+
+            <span class="stat-icon">
+                <i class="fas fa-comments"></i>
+            </span>
+
+        </div>
+
+        <h2 class="stat-number">
+            {{ total_messages }}
+        </h2>
+
+    </div>
+
+</div>
+
+<!-- DETAILS -->
+<div class="stats-grid">
+
+    <div class="stats-box">
+
+        <div class="stats-box-header">
+
+            <h3>
+                Répartition des utilisateurs
+            </h3>
+
+        </div>
+
+        <div class="stats-list">
+
+            <!-- DESIGNERS -->
+            <div class="stats-item">
+
+                <div class="stats-item-top">
+
+                    <span class="stats-name">
+                        Designers
+                    </span>
+
+                    <span class="stats-count">
+                        {{ designers }}
+                    </span>
+
+                </div>
+
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width:{% widthratio designers total_users 100 %}%;">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DEVELOPPEURS -->
+            <div class="stats-item">
+
+                <div class="stats-item-top">
+
+                    <span class="stats-name">
+                        Développeurs
+                    </span>
+
+                    <span class="stats-count">
+                        {{ developpeurs }}
+                    </span>
+
+                </div>
+
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width:{% widthratio developpeurs total_users 100 %}%;">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RECRUTEURS -->
+            <div class="stats-item">
+
+                <div class="stats-item-top">
+
+                    <span class="stats-name">
+                        Recruteurs
+                    </span>
+
+                    <span class="stats-count">
+                        {{ recruteurs }}
+                    </span>
+
+                </div>
+
+                <div class="stats-progress">
+                    <div class="stats-progress-bar"
+                         style="width:{% widthratio recruteurs total_users 100 %}%;">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+<h2>{{ user.username }} - Portfolio</h2>
+
+{% if projects %}
+    {% for project in projects %}
+        <div class="project-card">
+            <h3>{{ project.title }}</h3>
+            <p>{{ project.description }}</p>
+            <p>Catégorie : {{ project.get_category_display }}</p>
+            
+            {% for img in project.images.all %}
+                <img src="{{ img.image.url }}" alt="{{ project.title }}" width="200">
+            {% endfor %}
+            
+            {% if project.demo_link %}
+                <p><a href="{{ project.demo_link }}" target="_blank">Voir la démo / GitHub</a></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Aucun projet publié pour le moment.</p>
+{% endif %}

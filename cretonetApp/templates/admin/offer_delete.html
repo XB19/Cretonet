@@ -1,0 +1,398 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}
+Supprimer offre
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+DELETE PAGE
+========================================================= */
+
+.delete-page{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px 0;
+}
+
+/* CARD */
+
+.delete-card{
+    width:100%;
+    max-width:720px;
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:30px;
+    overflow:hidden;
+    box-shadow:0 8px 30px rgba(15,23,42,0.06);
+}
+
+/* HEADER */
+
+.delete-header{
+    position:relative;
+    padding:38px 35px;
+    background:linear-gradient(135deg,#fff1f2,#ffffff);
+    border-bottom:1px solid #eef2f7;
+    text-align:center;
+}
+
+.delete-icon{
+    width:84px;
+    height:84px;
+    margin:0 auto 22px;
+    border-radius:50%;
+    background:rgba(239,68,68,0.12);
+    color:#dc2626;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+}
+
+.delete-header h1{
+    font-size:2rem;
+    font-weight:800;
+    color:#111827;
+    margin-bottom:12px;
+}
+
+.delete-header p{
+    max-width:520px;
+    margin:auto;
+    color:#6b7280;
+    line-height:1.7;
+    font-size:15px;
+}
+
+/* CONTENT */
+
+.delete-body{
+    padding:35px;
+}
+
+/* OFFER INFO */
+
+.offer-box{
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:22px;
+    padding:24px;
+    margin-bottom:30px;
+}
+
+.offer-box-top{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:20px;
+}
+
+.offer-avatar{
+    width:58px;
+    height:58px;
+    border-radius:18px;
+    background:linear-gradient(135deg,#ff7a00,#ffb347);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    font-weight:800;
+}
+
+.offer-info{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+}
+
+.offer-info h3{
+    font-size:1.1rem;
+    font-weight:800;
+    color:#111827;
+}
+
+.offer-info span{
+    font-size:14px;
+    color:#6b7280;
+}
+
+/* DETAILS */
+
+.offer-details{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:18px;
+}
+
+.detail-item{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.detail-item small{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    color:#9ca3af;
+    font-weight:700;
+}
+
+.detail-item strong{
+    font-size:14px;
+    color:#111827;
+}
+
+/* WARNING */
+
+.warning-box{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    border-radius:18px;
+    padding:18px 20px;
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    margin-bottom:30px;
+}
+
+.warning-box i{
+    color:#dc2626;
+    font-size:20px;
+    margin-top:2px;
+}
+
+.warning-box p{
+    color:#991b1b;
+    font-size:14px;
+    line-height:1.7;
+    margin:0;
+}
+
+/* ACTIONS */
+
+.delete-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.action-btn{
+    border:none;
+    padding:14px 22px;
+    border-radius:14px;
+    font-size:14px;
+    font-weight:700;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    cursor:pointer;
+    transition:0.3s ease;
+}
+
+.action-btn.cancel{
+    background:#f3f4f6;
+    color:#374151;
+}
+
+.action-btn.delete{
+    background:#dc2626;
+    color:#fff;
+    box-shadow:0 12px 24px rgba(220,38,38,0.18);
+}
+
+.action-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+    .delete-header{
+        padding:30px 22px;
+    }
+
+    .delete-header h1{
+        font-size:1.6rem;
+    }
+
+    .delete-body{
+        padding:24px;
+    }
+
+    .offer-box-top{
+        align-items:flex-start;
+    }
+
+    .delete-actions{
+        flex-direction:column-reverse;
+        align-items:stretch;
+    }
+
+    .action-btn{
+        width:100%;
+    }
+
+}
+
+</style>
+
+<div class="delete-page">
+
+    <div class="delete-card">
+
+        <!-- HEADER -->
+        <div class="delete-header">
+
+            <div class="delete-icon">
+                <i class="fas fa-trash"></i>
+            </div>
+
+            <h1>
+                Supprimer l’offre
+            </h1>
+
+            <p>
+                Vous êtes sur le point de supprimer définitivement cette offre.
+                Cette action est irréversible.
+            </p>
+
+        </div>
+
+        <!-- BODY -->
+        <div class="delete-body">
+
+            <!-- OFFER -->
+            <div class="offer-box">
+
+                <div class="offer-box-top">
+
+                    <div class="offer-avatar">
+                        {{ offer.title|slice:":1"|upper }}
+                    </div>
+
+                    <div class="offer-info">
+
+                        <h3>
+                            {{ offer.title }}
+                        </h3>
+
+                        <span>
+                            Offre publiée par {{ offer.owner.username }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="offer-details">
+
+                    <div class="detail-item">
+
+                        <small>
+                            Catégorie
+                        </small>
+
+                        <strong>
+                            {{ offer.get_category_display }}
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-item">
+
+                        <small>
+                            Mode
+                        </small>
+
+                        <strong>
+                            {{ offer.get_work_mode_display }}
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-item">
+
+                        <small>
+                            Lieu
+                        </small>
+
+                        <strong>
+                            {{ offer.location }}
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-item">
+
+                        <small>
+                            Statut
+                        </small>
+
+                        <strong>
+                            {{ offer.get_status_display }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- WARNING -->
+            <div class="warning-box">
+
+                <i class="fas fa-triangle-exclamation"></i>
+
+                <p>
+                    Après suppression, cette offre ne sera plus visible sur la
+                    plateforme et toutes les informations associées seront perdues.
+                </p>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="delete-actions">
+
+                    <a href="{% url 'admin_validation_list' %}"
+                       class="action-btn cancel">
+
+                        <i class="fas fa-arrow-left"></i>
+                        Annuler
+
+                    </a>
+
+                    <button type="submit"
+                            class="action-btn delete">
+
+                        <i class="fas fa-trash"></i>
+                        Confirmer la suppression
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

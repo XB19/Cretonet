@@ -1,0 +1,606 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Signalements – Admin CreToNet
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================
+REPORTS PAGE
+========================================= */
+
+.reports-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* =========================================
+HEADER
+========================================= */
+
+.reports-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.reports-header-left{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.reports-title{
+font-size:30px;
+font-weight:700;
+color:var(--cto-text);
+line-height:1.2;
+}
+
+.reports-subtitle{
+font-size:15px;
+color:var(--cto-text-light);
+max-width:620px;
+line-height:1.7;
+}
+
+/* =========================================
+STATS CARDS
+========================================= */
+
+.reports-stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
+
+.report-stat-card{
+background:var(--cto-white);
+border-radius:18px;
+padding:24px;
+box-shadow:var(--cto-shadow);
+position:relative;
+overflow:hidden;
+transition:0.25s ease;
+}
+
+.report-stat-card:hover{
+transform:translateY(-4px);
+}
+
+.report-stat-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,var(--cto-orange),#ffb067);
+}
+
+.report-stat-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+}
+
+.report-stat-label{
+font-size:14px;
+font-weight:600;
+color:var(--cto-text-light);
+}
+
+.report-stat-icon{
+width:50px;
+height:50px;
+border-radius:14px;
+background:var(--cto-orange-light);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+color:var(--cto-orange);
+}
+
+.report-stat-number{
+font-size:34px;
+font-weight:700;
+color:var(--cto-text);
+}
+
+/* =========================================
+TABLE BOX
+========================================= */
+
+.reports-box{
+background:var(--cto-white);
+border-radius:20px;
+box-shadow:var(--cto-shadow);
+overflow:hidden;
+}
+
+.reports-box-header{
+padding:22px 24px;
+border-bottom:1px solid var(--cto-border);
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.reports-box-header h3{
+font-size:18px;
+font-weight:600;
+display:flex;
+align-items:center;
+gap:10px;
+color:var(--cto-text);
+}
+
+.reports-box-header h3 i{
+color:var(--cto-orange);
+}
+
+.admin-badge{
+padding:8px 14px;
+border-radius:999px;
+font-size:13px;
+font-weight:600;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.admin-badge.red{
+background:#fee2e2;
+color:#dc2626;
+}
+
+/* =========================================
+TABLE
+========================================= */
+
+.reports-table-wrapper{
+overflow-x:auto;
+}
+
+.reports-table{
+width:100%;
+border-collapse:collapse;
+min-width:850px;
+}
+
+.reports-table thead{
+background:#fafafa;
+}
+
+.reports-table th{
+padding:16px 20px;
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:0.4px;
+color:#6b7280;
+text-align:left;
+white-space:nowrap;
+}
+
+.reports-table td{
+padding:18px 20px;
+border-top:1px solid var(--cto-border);
+vertical-align:middle;
+font-size:14px;
+color:var(--cto-text);
+}
+
+.reports-table tbody tr{
+transition:0.2s ease;
+}
+
+.reports-table tbody tr:hover{
+background:#fafafa;
+}
+
+/* =========================================
+USER INFO
+========================================= */
+
+.report-user{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.report-avatar{
+width:44px;
+height:44px;
+border-radius:50%;
+background:var(--cto-orange-light);
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:15px;
+color:var(--cto-orange);
+flex-shrink:0;
+}
+
+.report-user-info{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+.report-user-info h4{
+font-size:14px;
+font-weight:600;
+color:var(--cto-text);
+}
+
+.report-user-info span{
+font-size:12px;
+color:var(--cto-text-light);
+}
+
+/* =========================================
+TYPE BADGE
+========================================= */
+
+.report-type{
+display:inline-flex;
+align-items:center;
+padding:7px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:600;
+background:#eff6ff;
+color:#2563eb;
+}
+
+/* =========================================
+STATUS BADGE
+========================================= */
+
+.status-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:7px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:600;
+}
+
+.status-badge.success{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.status-badge.pending{
+background:#fef3c7;
+color:#d97706;
+}
+
+/* =========================================
+ACTIONS
+========================================= */
+
+.table-actions{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.btn-table{
+width:38px;
+height:38px;
+border:none;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
+cursor:pointer;
+transition:0.2s ease;
+text-decoration:none;
+}
+
+.btn-view{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.btn-resolve{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.btn-delete{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.btn-table:hover{
+transform:translateY(-2px);
+}
+
+/* =========================================
+EMPTY STATE
+========================================= */
+
+.empty-admin-state{
+padding:70px 25px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+.empty-admin-state i{
+font-size:60px;
+margin-bottom:20px;
+color:var(--cto-orange);
+opacity:0.85;
+}
+
+.empty-admin-state h3{
+font-size:22px;
+margin-bottom:10px;
+color:var(--cto-text);
+}
+
+.empty-admin-state p{
+font-size:15px;
+color:var(--cto-text-light);
+max-width:500px;
+line-height:1.7;
+}
+
+/* =========================================
+RESPONSIVE
+========================================= */
+
+@media(max-width:768px){
+
+.reports-title{
+font-size:24px;
+}
+
+.reports-box-header{
+padding:18px;
+}
+
+.reports-table th,
+.reports-table td{
+padding:15px;
+}
+
+.report-stat-number{
+font-size:28px;
+}
+
+}
+
+</style>
+
+<div class="reports-page">
+
+    <!-- HEADER -->
+    <div class="reports-header">
+
+        <div class="reports-header-left">
+
+            <h1 class="reports-title">
+                Signalements
+            </h1>
+
+            <p class="reports-subtitle">
+                Consultez tous les signalements effectués par les utilisateurs
+                de la plateforme CreToNet et gérez les contenus signalés.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="reports-stats">
+
+        <div class="report-stat-card">
+
+            <div class="report-stat-top">
+
+                <span class="report-stat-label">
+                    Total signalements
+                </span>
+
+                <div class="report-stat-icon">
+                    <i class="fas fa-flag"></i>
+                </div>
+
+            </div>
+
+            <h2 class="report-stat-number">
+                {{ reports.count }}
+            </h2>
+
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="reports-box">
+
+        <div class="reports-box-header">
+
+            <h3>
+                <i class="fas fa-triangle-exclamation"></i>
+                Liste des signalements
+            </h3>
+
+            <span class="admin-badge red">
+                {{ reports.count }} signalement{{ reports.count|pluralize }}
+            </span>
+
+        </div>
+
+        {% if reports %}
+
+        <div class="reports-table-wrapper">
+
+            <table class="reports-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Type</th>
+                        <th>Motif</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for report in reports %}
+
+                    <tr>
+
+                        <!-- USER -->
+                        <td>
+
+                            <div class="report-user">
+
+                                <div class="report-avatar">
+                                    {{ report.reporter.username|slice:":1"|upper }}
+                                </div>
+
+                                <div class="report-user-info">
+
+                                    <h4>
+                                        {{ report.reporter.username }}
+                                    </h4>
+
+                                    <span>
+                                        {{ report.reporter.email }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <!-- TYPE -->
+                        <td>
+
+                            <span class="report-type">
+                                {{ report.get_report_type_display }}
+                            </span>
+
+                        </td>
+
+                        <!-- MOTIF -->
+                        <td>
+                            {{ report.reason|truncatechars:90 }}
+                        </td>
+
+                        <!-- DATE -->
+                        <td>
+                            {{ report.created_at|date:"d/m/Y" }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+
+                            {% if report.resolved %}
+
+                            <span class="status-badge success">
+                                Résolu
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-badge pending">
+                                En attente
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td>
+
+                            <div class="table-actions">
+
+                                <a href="{% url 'admin_report_detail' report.id %}"
+                                   class="btn-table btn-view">
+
+                                    <i class="fas fa-eye"></i>
+
+                                </a>
+
+                                <a href="{% url 'resolve_report' report.id %}"
+                                   class="btn-table btn-resolve">
+
+                                    <i class="fas fa-check"></i>
+
+                                </a>
+
+                                <a href="{% url 'delete_report' report.id %}"
+                                   class="btn-table btn-delete">
+
+                                    <i class="fas fa-trash"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-admin-state">
+
+            <i class="fas fa-shield-heart"></i>
+
+            <h3>
+                Aucun signalement
+            </h3>
+
+            <p>
+                Aucun signalement n’a encore été effectué sur la plateforme.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Offres - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ===== SECTION ===== */
+.offres-section {
+    padding: 40px 0 80px;
+    background: #ffffff;
+}
+
+.offres-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+/* ===== TITRE PAGE ===== */
+.offres-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+/* ===== RECHERCHE ===== */
+.offre-search {
+    display: flex;
+    max-width: 520px;
+    margin: 0 auto 25px;
+}
+
+.offre-search input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    outline: none;
+}
+
+.offre-search button {
+    background: #000;
+    color: #fff;
+    padding: 0 20px;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+}
+
+/* ===== FILTRES ===== */
+.offre-filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 35px;
+}
+
+.filter-btn {
+    padding: 8px 22px;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    background: #f3f3f3;
+    font-size: 14px;
+    text-decoration: none;
+    color: #000;
+    transition: all 0.25s ease;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+/* ===== GRILLE ===== */
+.offre-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* ===== CARTE ===== */
+.offre-card {
+    background: #f4f4f4;
+    border-radius: 24px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.offre-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 35px rgba(0,0,0,0.08);
+}
+
+/* ===== HEADER ===== */
+.offre-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+/* 🔥 TITRE OFFRE PLUS GRAND */
+.offre-title {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 0;
+    word-break: break-word;
+}
+
+/* ===== BADGE ===== */
+.offre-badge {
+    background: #000;
+    color: #fff;
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 30px;
+    white-space: nowrap;
+}
+
+/* 🔥 DESCRIPTION AMÉLIORÉE */
+.offre-desc {
+    margin: 16px 0 20px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+    word-break: break-word;
+}
+
+/* ===== INFOS ===== */
+.offre-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 18px;
+    margin-bottom: 22px;
+}
+
+.offre-info small {
+    display: block;
+    font-size: 11px;
+    color: #999;
+}
+
+.offre-info span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* ===== STATUT ===== */
+.status.available {
+    color: #16a34a;
+}
+
+.status.completed {
+    color: #dc2626;
+}
+
+/* 🔥 BOUTON CENTRÉ */
+.offre-btn {
+    display: inline-block;
+    margin: 0 auto;
+    background: #f97316;
+    color: #fff;
+    padding: 11px 28px;
+    border-radius: 50px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.offre-btn:hover {
+    background: #ea580c;
+    transform: translateY(-2px);
+}
+
+/* ===== VIDE ===== */
+.empty-text {
+    text-align: center;
+    color: #666;
+    margin-top: 60px;
+}
+
+@media (max-width: 600px) {
+    .offre-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<section class="offres-section">
+    <div class="offres-container">
+
+        <h2 class="offres-title">Offres disponibles</h2>
+
+        <!-- Recherche -->
+        <form method="get" class="offre-search">
+            <input type="text" name="q" placeholder="Rechercher une offre..." value="{{ q }}">
+            <button type="submit"></button>
+        </form>
+
+        <!-- Filtres -->
+        <div class="offre-filters">
+            <a href="{% url 'offers_list' %}" class="filter-btn {% if not category %}active{% endif %}">
+                Toutes
+            </a>
+
+            {% for code, label in offers.model.CATEGORY_CHOICES %}
+                <a href="?category={{ code }}{% if q %}&q={{ q }}{% endif %}"
+                   class="filter-btn {% if category == code %}active{% endif %}">
+                    {{ label }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Offres -->
+        {% if offers %}
+        <div class="offre-grid">
+            {% for offer in offers %}
+                <div class="offre-card">
+                    <div>
+                        <div class="offre-header">
+                            <h3 class="offre-title">{{ offer.title }}</h3>
+                            <span class="offre-badge">{{ offer.get_category_display }}</span>
+                        </div>
+
+                        <p class="offre-desc">
+                            {{ offer.description|truncatechars:220 }}
+                        </p>
+
+                        <div class="offre-info">
+                            <div>
+                                <small>Profil requis</small>
+                                <span>{{ offer.required_profile }}</span>
+                            </div>
+                            <div>
+                                <small>Mode de travail</small>
+                                <span>{{ offer.get_work_mode_display }}</span>
+                            </div>
+                            <div>
+                                <small>Deadline</small>
+                                <span>{{ offer.deadline|date:"d M Y" }}</span>
+                            </div>
+                            <div>
+                                <small>Statut</small>
+                                <span class="status {{ offer.status }}">
+                                    {{ offer.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if offer.owner %}
+                    <a href="{% url 'offer_detail' offer.pk %}" class="offre-btn">
+                        Voir l'offre →
+                    </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <p class="empty-text">Aucune offre disponible pour le moment.</p>
+        {% endif %}
+
+    </div>
+</section>
+
+{% endblock %}

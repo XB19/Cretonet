@@ -1,0 +1,927 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Validations – Admin CreToNet
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+VALIDATIONS PAGE
+========================================================= */
+
+.validation-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* HEADER */
+
+.validation-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.validation-header-left h1{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+margin-bottom:8px;
+}
+
+.validation-header-left p{
+color:#6b7280;
+font-size:15px;
+line-height:1.7;
+max-width:760px;
+}
+
+/* =========================================================
+SUMMARY
+========================================================= */
+
+.validation-summary{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:20px;
+}
+
+.summary-card{
+background:#fff;
+border-radius:24px;
+padding:24px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 18px rgba(15,23,42,0.04);
+position:relative;
+overflow:hidden;
+transition:0.3s ease;
+text-decoration:none;
+display:block;
+}
+
+.summary-card::before{
+content:"";
+position:absolute;
+left:0;
+top:0;
+width:100%;
+height:5px;
+background:linear-gradient(90deg,#ff7a00,#ffb347);
+}
+
+.summary-card:hover{
+transform:translateY(-5px);
+box-shadow:0 18px 35px rgba(15,23,42,0.08);
+}
+
+.summary-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.summary-top span{
+font-size:14px;
+color:#6b7280;
+font-weight:600;
+}
+
+.summary-icon{
+width:54px;
+height:54px;
+border-radius:16px;
+background:rgba(255,122,0,0.10);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:21px;
+color:#ff7a00;
+}
+
+.summary-number{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+line-height:1;
+margin-bottom:10px;
+}
+
+.summary-card small{
+font-size:13px;
+color:#6b7280;
+}
+
+/* =========================================================
+FILTER TABS
+========================================================= */
+
+.validation-tabs{
+display:flex;
+align-items:center;
+gap:12px;
+flex-wrap:wrap;
+}
+
+.validation-tab{
+padding:11px 18px;
+border-radius:999px;
+font-size:14px;
+font-weight:700;
+text-decoration:none;
+background:#fff;
+border:1px solid #e5e7eb;
+color:#374151;
+transition:0.25s ease;
+}
+
+.validation-tab:hover{
+background:#fff7ed;
+color:#ea580c;
+border-color:#fed7aa;
+}
+
+.validation-tab.active{
+background:#ff7a00;
+color:#fff;
+border-color:#ff7a00;
+box-shadow:0 10px 25px rgba(255,122,0,0.18);
+}
+
+/* =========================================================
+BOX
+========================================================= */
+
+.validation-box{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+.validation-box-header{
+padding:28px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+}
+
+.validation-box-header h3{
+display:flex;
+align-items:center;
+gap:12px;
+font-size:1.15rem;
+font-weight:800;
+color:#111827;
+}
+
+.validation-box-header h3 i{
+color:#ff7a00;
+}
+
+.validation-badge{
+background:rgba(59,130,246,0.12);
+color:#2563eb;
+padding:10px 16px;
+border-radius:999px;
+font-weight:700;
+font-size:14px;
+}
+
+/* =========================================================
+TABLE
+========================================================= */
+
+.table-wrapper{
+width:100%;
+overflow-x:auto;
+}
+
+.validation-table{
+width:100%;
+border-collapse:collapse;
+min-width:980px;
+}
+
+.validation-table thead{
+background:#f8fafc;
+}
+
+.validation-table th{
+padding:18px 22px;
+text-align:left;
+font-size:13px;
+text-transform:uppercase;
+letter-spacing:.5px;
+color:#6b7280;
+font-weight:700;
+}
+
+.validation-table td{
+padding:22px;
+border-top:1px solid #f1f5f9;
+vertical-align:middle;
+}
+
+/* CONTENT TITLE */
+
+.content-title{
+display:flex;
+flex-direction:column;
+gap:6px;
+}
+
+.content-title strong{
+font-size:15px;
+font-weight:700;
+color:#111827;
+}
+
+.content-title span{
+font-size:13px;
+color:#6b7280;
+}
+
+/* CATEGORY */
+
+.category-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:8px 14px;
+border-radius:999px;
+background:#fff7ed;
+color:#ea580c;
+font-size:13px;
+font-weight:700;
+}
+
+/* USER */
+
+.recruiter-info{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.recruiter-avatar{
+width:42px;
+height:42px;
+border-radius:50%;
+background:linear-gradient(135deg,#ff7a00,#ffb347);
+display:flex;
+align-items:center;
+justify-content:center;
+color:#fff;
+font-size:14px;
+font-weight:700;
+}
+
+.recruiter-info div{
+display:flex;
+flex-direction:column;
+gap:3px;
+}
+
+.recruiter-info strong{
+font-size:14px;
+color:#111827;
+}
+
+.recruiter-info span{
+font-size:12px;
+color:#6b7280;
+}
+
+/* DATE */
+
+.validation-date{
+font-size:14px;
+font-weight:600;
+color:#374151;
+}
+
+/* STATUS */
+
+.status-badge{
+padding:8px 14px;
+border-radius:999px;
+font-size:12px;
+font-weight:700;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.status-badge.pending{
+background:#fff7ed;
+color:#ea580c;
+}
+
+.status-badge.approved{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.status-badge.rejected{
+background:#fee2e2;
+color:#dc2626;
+}
+
+/* ACTIONS */
+
+.validation-actions{
+display:flex;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.validation-btn{
+border:none;
+padding:11px 16px;
+border-radius:12px;
+font-size:13px;
+font-weight:700;
+text-decoration:none;
+cursor:pointer;
+transition:0.25s ease;
+display:inline-flex;
+align-items:center;
+gap:8px;
+}
+
+.validation-btn.view{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.validation-btn.approve{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.validation-btn.reject{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.validation-btn:hover{
+transform:translateY(-2px);
+}
+
+/* EMPTY */
+
+.empty-validation{
+padding:75px 25px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+.empty-validation i{
+font-size:60px;
+margin-bottom:20px;
+color:#22c55e;
+}
+
+.empty-validation h3{
+font-size:1.4rem;
+font-weight:800;
+color:#111827;
+margin-bottom:10px;
+}
+
+.empty-validation p{
+font-size:15px;
+color:#6b7280;
+max-width:500px;
+line-height:1.7;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:768px){
+
+.validation-header-left h1{
+font-size:1.7rem;
+}
+
+.validation-box-header{
+padding:22px;
+}
+
+.validation-table td,
+.validation-table th{
+padding:16px;
+}
+
+}
+
+</style>
+
+<div class="validation-page">
+
+    <!-- HEADER -->
+    <div class="validation-header">
+
+        <div class="validation-header-left">
+
+            <h1>
+                Centre de validation
+            </h1>
+
+            <p>
+                Gérez les offres et projets soumis avant leur publication
+                sur la plateforme CreToNet.
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="validation-summary">
+
+        <!-- OFFRES -->
+        <a href="{% url 'admin_validation_list' %}?filter=pending&type=offers"
+           class="summary-card">
+
+            <div class="summary-top">
+
+                <span>
+                    Offres en attente
+                </span>
+
+                <div class="summary-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+
+            </div>
+
+            <h2 class="summary-number">
+                {{ pending_offers_count }}
+            </h2>
+
+            <small>
+                Cliquez pour afficher les offres
+            </small>
+
+        </a>
+
+        <!-- PROJETS -->
+        <a href="{% url 'admin_validation_list' %}?filter=pending&type=projects"
+           class="summary-card">
+
+            <div class="summary-top">
+
+                <span>
+                    Projets en attente
+                </span>
+
+                <div class="summary-icon">
+                    <i class="fas fa-diagram-project"></i>
+                </div>
+
+            </div>
+
+            <h2 class="summary-number">
+                {{ pending_projects_count }}
+            </h2>
+
+            <small>
+                Cliquez pour afficher les projets
+            </small>
+
+        </a>
+
+        <!-- VALIDÉS -->
+        <a href="{% url 'admin_validation_list' %}?filter=approved"
+           class="summary-card">
+
+            <div class="summary-top">
+
+                <span>
+                    Déjà validés
+                </span>
+
+                <div class="summary-icon">
+                    <i class="fas fa-circle-check"></i>
+                </div>
+
+            </div>
+
+            <h2 class="summary-number">
+                {{ approved_count }}
+            </h2>
+
+            <small>
+                Contenus déjà approuvés
+            </small>
+
+        </a>
+
+        <!-- REFUSÉS -->
+        <a href="{% url 'admin_validation_list' %}?filter=rejected"
+           class="summary-card">
+
+            <div class="summary-top">
+
+                <span>
+                    Accès refusés
+                </span>
+
+                <div class="summary-icon">
+                    <i class="fas fa-ban"></i>
+                </div>
+
+            </div>
+
+            <h2 class="summary-number">
+                {{ rejected_count }}
+            </h2>
+
+            <small>
+                Contenus refusés récemment
+            </small>
+
+        </a>
+
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="validation-tabs">
+
+        <a href="{% url 'admin_validation_list' %}"
+           class="validation-tab {% if current_filter == 'all' %}active{% endif %}">
+            Tout afficher
+        </a>
+
+        <a href="{% url 'admin_validation_list' %}?filter=pending"
+           class="validation-tab {% if current_filter == 'pending' %}active{% endif %}">
+            En attente
+        </a>
+
+        <a href="{% url 'admin_validation_list' %}?filter=approved"
+           class="validation-tab {% if current_filter == 'approved' %}active{% endif %}">
+            Validés
+        </a>
+
+        <a href="{% url 'admin_validation_list' %}?filter=rejected"
+           class="validation-tab {% if current_filter == 'rejected' %}active{% endif %}">
+            Refusés
+        </a>
+
+    </div>
+
+    <!-- OFFRES -->
+    <div class="validation-box">
+
+        <div class="validation-box-header">
+
+            <h3>
+                <i class="fas fa-briefcase"></i>
+                Offres
+            </h3>
+
+            <span class="validation-badge">
+                {{ offers.count }} résultat{{ offers.count|pluralize }}
+            </span>
+
+        </div>
+
+        {% if offers %}
+
+        <div class="table-wrapper">
+
+            <table class="validation-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Offre</th>
+                        <th>Catégorie</th>
+                        <th>Auteur</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in offers %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="content-title">
+
+                                <strong>
+                                    {{ item.title }}
+                                </strong>
+
+                                <span>
+                                    Publication soumise à modération
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="category-badge">
+                                {{ item.get_category_display }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="recruiter-info">
+
+                                <div class="recruiter-avatar">
+                                    {{ item.owner.username|slice:":1"|upper }}
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ item.owner.username }}
+                                    </strong>
+
+                                    <span>
+                                        Recruteur
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="validation-date">
+                                {{ item.created_at|date:"d/m/Y" }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {% if item.status == 'available' %}
+
+                            <span class="status-badge approved">
+                                Validé
+                            </span>
+
+                            {% elif item.status == 'rejected' %}
+
+                            <span class="status-badge rejected">
+                                Refusé
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-badge pending">
+                                En attente
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <div class="validation-actions">
+
+                                <a href="{% url 'admin_offer_detail' item.id %}"
+                                   class="validation-btn view">
+
+                                    <i class="fas fa-eye"></i>
+                                    Voir
+
+                                </a>
+
+                                <a href="{% url 'admin_offer_detail' item.id %}"
+                                   class="validation-btn approve">
+
+                                    <i class="fas fa-check"></i>
+                                    Valider
+
+                                </a>
+
+                                <a href="{% url 'admin_offer_delete' item.id %}"
+                                   class="validation-btn reject"
+                                   onclick="return confirm('Voulez-vous vraiment refuser cette offre ?');">
+
+                                    <i class="fas fa-xmark"></i>
+                                    Refuser
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- PROJETS -->
+    <div class="validation-box">
+
+        <div class="validation-box-header">
+
+            <h3>
+                <i class="fas fa-diagram-project"></i>
+                Projets
+            </h3>
+
+            <span class="validation-badge">
+                {{ projects.count }} résultat{{ projects.count|pluralize }}
+            </span>
+
+        </div>
+
+        {% if projects %}
+
+        <div class="table-wrapper">
+
+            <table class="validation-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Projet</th>
+                        <th>Catégorie</th>
+                        <th>Auteur</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in projects %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="content-title">
+
+                                <strong>
+                                    {{ item.title }}
+                                </strong>
+
+                                <span>
+                                    Projet soumis à modération
+                                </span>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="category-badge">
+                                {{ item.get_category_display }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <div class="recruiter-info">
+
+                                <div class="recruiter-avatar">
+                                    {{ item.owner.username|slice:":1"|upper }}
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        {{ item.owner.username }}
+                                    </strong>
+
+                                    <span>
+                                        Créateur
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </td>
+
+                        <td>
+
+                            <span class="validation-date">
+                                {{ item.created_at|date:"d/m/Y" }}
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            {% if item.status == 'published' %}
+
+                            <span class="status-badge approved">
+                                Validé
+                            </span>
+
+                            {% elif item.status == 'rejected' %}
+
+                            <span class="status-badge rejected">
+                                Refusé
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-badge pending">
+                                En attente
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <div class="validation-actions">
+
+                                <a href="{% url 'admin_project_detail' item.id %}"
+                                   class="validation-btn view">
+
+                                    <i class="fas fa-eye"></i>
+                                    Voir
+
+                                </a>
+
+                                <a href="{% url 'admin_project_edit' item.id %}"
+                                   class="validation-btn approve">
+
+                                    <i class="fas fa-check"></i>
+                                    Valider
+
+                                </a>
+
+                                <a href="{% url 'admin_project_delete' item.id %}"
+                                   class="validation-btn reject"
+                                   onclick="return confirm('Voulez-vous vraiment refuser ce projet ?');">
+
+                                    <i class="fas fa-xmark"></i>
+                                    Refuser
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

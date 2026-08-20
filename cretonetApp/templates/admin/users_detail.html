@@ -1,0 +1,259 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Détails de l'utilisateur{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* =========================================================
+USER DETAIL PAGE (COHÉRENT DESIGN ADMIN)
+========================================================= */
+
+.user-detail-page{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+/* HEADER */
+.user-header{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+flex-wrap:wrap;
+gap:20px;
+}
+
+.user-title{
+font-size:2rem;
+font-weight:800;
+color:#111827;
+}
+
+.user-subtitle{
+font-size:15px;
+color:#6b7280;
+max-width:700px;
+line-height:1.7;
+}
+
+/* CARD WRAPPER */
+.user-card{
+background:#fff;
+border-radius:28px;
+border:1px solid #eef2f7;
+box-shadow:0 4px 22px rgba(15,23,42,0.04);
+overflow:hidden;
+}
+
+/* CARD HEADER */
+.user-card-header{
+padding:26px;
+border-bottom:1px solid #eef2f7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.user-card-header h3{
+font-size:1.1rem;
+font-weight:800;
+color:#111827;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.user-card-header i{
+color:#ff7a00;
+}
+
+/* CONTENT */
+.user-card-content{
+padding:28px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:20px;
+}
+
+/* DETAIL ITEM */
+.user-detail-item{
+background:#f8fafc;
+border:1px solid #eef2f7;
+border-radius:20px;
+padding:20px;
+display:flex;
+flex-direction:column;
+gap:8px;
+transition:0.25s ease;
+}
+
+.user-detail-item:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 20px rgba(15,23,42,0.06);
+}
+
+.user-detail-label{
+font-size:12px;
+text-transform:uppercase;
+letter-spacing:.5px;
+font-weight:700;
+color:#6b7280;
+}
+
+.user-detail-value{
+font-size:15px;
+font-weight:600;
+color:#111827;
+word-break:break-word;
+}
+
+/* ROLE BADGE */
+.role-badge{
+display:inline-flex;
+align-items:center;
+padding:8px 14px;
+border-radius:999px;
+font-size:13px;
+font-weight:700;
+width:fit-content;
+}
+
+.role-admin{
+background:#fee2e2;
+color:#dc2626;
+}
+
+.role-designer{
+background:#e0f2fe;
+color:#0284c7;
+}
+
+.role-developpeur{
+background:#dcfce7;
+color:#16a34a;
+}
+
+.role-recruteur{
+background:#fef3c7;
+color:#d97706;
+}
+
+/* ACTIONS */
+.user-actions{
+display:flex;
+gap:14px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+.btn-action{
+height:46px;
+padding:0 20px;
+border-radius:14px;
+font-size:14px;
+font-weight:700;
+text-decoration:none;
+display:inline-flex;
+align-items:center;
+gap:8px;
+transition:0.25s ease;
+}
+
+.btn-edit{
+background:#fff7ed;
+color:#ff7a00;
+border:1px solid #fed7aa;
+}
+
+.btn-back{
+background:#eff6ff;
+color:#2563eb;
+}
+
+.btn-action:hover{
+transform:translateY(-2px);
+box-shadow:0 10px 20px rgba(0,0,0,0.06);
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+.user-title{font-size:1.6rem;}
+.user-card-content{grid-template-columns:1fr;}
+}
+
+</style>
+
+<div class="user-detail-page">
+
+    <!-- HEADER -->
+    <div class="user-header">
+
+        <div>
+            <h1 class="user-title">
+                👤 Détails de l'utilisateur
+            </h1>
+
+            <p class="user-subtitle">
+                Informations complètes sur le compte utilisateur et son rôle dans la plateforme.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- CARD -->
+    <div class="user-card">
+
+        <div class="user-card-header">
+            <h3>
+                <i class="fas fa-user"></i>
+                Informations utilisateur
+            </h3>
+        </div>
+
+        <div class="user-card-content">
+
+            <!-- EMAIL -->
+            <div class="user-detail-item">
+                <span class="user-detail-label">Email</span>
+                <span class="user-detail-value">{{ user.email }}</span>
+            </div>
+
+            <!-- ROLE -->
+            <div class="user-detail-item">
+                <span class="user-detail-label">Rôle</span>
+
+                <span class="role-badge role-{{ user.role }}">
+                    {{ user.get_role_display }}
+                </span>
+            </div>
+
+            <!-- DATE -->
+            <div class="user-detail-item">
+                <span class="user-detail-label">Date d'inscription</span>
+                <span class="user-detail-value">
+                    {{ user.date_inscription|date:"d/m/Y" }}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="user-actions">
+
+        <a href="{% url 'admin_user_edit' user.pk %}" class="btn-action btn-edit">
+            ✏️ Modifier
+        </a>
+
+        <a href="{% url 'admin_user_list' %}" class="btn-action btn-back">
+            ← Retour
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'clients/base.html' %}
+{% block title %}Supprimer le projet - CreToNet{% endblock %}
+
+{% block content %}
+<div style="max-width:500px; margin:50px auto; padding:30px; background:#fff; border-radius:15px; box-shadow:0 8px 25px rgba(0,0,0,0.08); text-align:center;">
+    <h2 style="color:#ff3300;">Supprimer le projet : {{ object.title }}</h2>
+    <p>Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" style="padding:10px 25px; background:#ff3300; color:#fff; border:none; border-radius:10px; cursor:pointer; margin-right:10px;">Supprimer</button>
+        <a href="{% url 'admin_project_list' %}" style="padding:10px 25px; background:#ccc; color:#000; border-radius:10px; text-decoration:none;">Annuler</a>
+    </form>
+</div>
+{% endblock %}

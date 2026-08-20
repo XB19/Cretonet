@@ -1,0 +1,26 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.Python
+venv/
+env/
+.venv/
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Media / user uploads (large binary files, not source)
+media/
+project_images/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

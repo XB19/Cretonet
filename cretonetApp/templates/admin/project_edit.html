@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Modifier projet{% endblock %}
+
+{% block content %}
+
+<h1 class="page-title">✏️ Modifier le projet</h1>
+
+<!-- Affichage des messages -->
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" class="admin-form">
+    {% csrf_token %}
+
+    <label>Propriétaire <span style="color:red">*</span></label>
+    <select name="owner" required>
+        <option value="">-- Sélectionner un utilisateur --</option>
+        {% for user in users %}
+            <option value="{{ user.id }}" {% if project.owner.id == user.id %}selected{% endif %}>
+                {{ user.username }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label>Titre <span style="color:red">*</span></label>
+    <input type="text" name="title" value="{{ project.title }}" required>
+
+    <label>Description <span style="color:red">*</span></label>
+    <textarea name="description" required>{{ project.description }}</textarea>
+
+    <label>Catégorie</label>
+    <select name="category">
+        <option value="design_graphique" {% if project.category == 'design_graphique' %}selected{% endif %}>
+            Design Graphique
+        </option>
+        <option value="dev_web" {% if project.category == 'dev_web' %}selected{% endif %}>
+            Développement Web
+        </option>
+        <option value="ui_ux" {% if project.category == 'ui_ux' %}selected{% endif %}>
+            UI/UX
+        </option>
+    </select>
+
+    <label>Technologies</label>
+    <input type="text" name="technologies" value="{{ project.technologies }}">
+
+    <button type="submit" class="btn-add">Mettre à jour</button>
+</form>
+
+{% endblock %}

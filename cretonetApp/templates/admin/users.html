@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Gestion Utilisateurs{% endblock %}
+
+{% block content %}
+
+<div class="users-page">
+
+    <h1 class="page-title"> Gestion des utilisateurs</h1>
+
+    <div class="table-actions-top">
+        <a href="{% url 'admin_user_add' %}" class="btn-add">
+            ➕ Ajouter un utilisateur
+        </a>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Date d'inscription</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ forloop.counter0|add:start_index }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.get_role_display }}</td>
+                    <td>{{ user.date_inscription|date:"d/m/Y" }}</td>
+                    <td class="table-actions">
+                        <a href="{% url 'admin_user_detail' user.pk %}" class="btn-action view">Voir</a>
+                        <a href="{% url 'admin_user_edit' user.pk %}" class="btn-action edit">Modifier</a>
+                        <a href="{% url 'admin_user_delete' user.pk %}" class="btn-action delete"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                           Supprimer
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty-table">
+                        Aucun utilisateur trouvé.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}" class="page-link">
+                &laquo; Précédent
+            </a>
+        {% endif %}
+
+        {% for num in users.paginator.page_range %}
+            {% if num == users.number %}
+                <span class="page-link current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}" class="page-link">
+                Suivant &raquo;
+            </a>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

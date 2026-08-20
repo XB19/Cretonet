@@ -1,0 +1,673 @@
+{% extends 'clients/base.html' %}
+{% load static %}
+
+{% block title %}Créer un projet - CreToNet{% endblock %}
+
+{% block content %}
+
+<style>
+/* ==== LAYOUT BEHANCE STYLE (TON STYLE INTACT) ==== */
+.project-wrapper {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center; /* centre horizontal */
+    align-items: center;     /* centre vertical */
+    background: #f0f4f8;
+    padding: 60px 20px;
+}
+
+.project-card {
+    width: 100%;
+    max-width: 1100px;
+    background: #ffffff;
+    padding: 40px 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    animation: fadeInUp .7s ease;
+    position: relative;
+}
+
+/* Title */
+.project-card h2 {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #0d3b66;
+    margin-bottom: 25px;
+}
+
+/* ===================== FIX ALIGNEMENT / CENTRAGE ===================== */
+
+.preview-zone {
+    width: 100%;
+    max-width: 900px;              /* limite largeur */
+    margin-left: auto;             /* centrage horizontal */
+    margin-right: auto;
+    min-height: 350px;
+    border: 2px dashed #cfd8dc;
+    background: #fafafa;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes par défaut */
+    gap: 14px;
+    align-items: start;
+    justify-items: center;
+    padding: 18px;
+    margin-bottom: 30px;
+    transition: 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .preview-zone {
+      grid-template-columns: 1fr;
+      max-width: 100%;
+  }
+}
+
+
+/* Responsive grid: 2 cols tablet, 1 col mobile */
+@media (max-width: 900px) {
+  .preview-zone { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .preview-zone { grid-template-columns: 1fr; }
+}
+
+/* When empty, show centered helper */
+.preview-zone.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 45px;
+}
+
+/* Each preview item (thumbnail card) */
+.preview-item {
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    position: relative;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Thumbnails keep aspect */
+.preview-thumb {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f7f7f8;
+}
+.preview-thumb img,
+.preview-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Meta area under thumbnail */
+.preview-meta {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.preview-meta .meta-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #222;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.preview-meta .meta-controls {
+    display: flex;
+    gap: 6px;
+}
+
+/* Small control buttons */
+.ctrl-btn {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.ctrl-btn:hover { background: #f3f3f3; }
+
+/* Preview menu (dropdown-like) */
+.preview-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+    z-index: 20;
+}
+.preview-menu button {
+    width: 170px;
+    padding: 10px 12px;
+    text-align: left;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+}
+.preview-menu button:hover { background: #f4f4f4; }
+
+/* Menu toggle button (top-right corner) */
+.preview-menu-toggle {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.55);
+    color: #fff;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Action cards (below grid) - centrées */
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 22px;
+    margin-bottom: 18px;
+    justify-content: center; /* centrage horizontal */
+    max-width: 800px;        /* limite largeur totale */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.action-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 20px 10px;
+    text-align: center;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.12);
+}
+
+.action-card i {
+    font-size: 2.3rem;
+    color: #0d3b66;
+    margin-bottom: 8px;
+}
+
+.action-card span {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+/* Publish button consistent */
+.btn-publish {
+    padding: 14px 40px;
+    background: #ff6600;
+    color: #fff;
+    border: none;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 40px;
+    display: block;
+    margin: 10px auto 0;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+.btn-publish:hover {
+    transform: translateY(-3px);
+    opacity: .95;
+}
+
+/* Small editable form modal (simple) */
+.edit-modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 60;
+}
+.edit-modal {
+  width: 92%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+}
+.edit-row { display:flex; gap:8px; align-items:center; }
+.edit-row label { min-width: 80px; font-weight: 600; color:#333; }
+.edit-row input, .edit-row textarea {
+  flex:1; padding:8px 10px; border-radius:8px; border:1px solid #e6e6e6; background:#fafafa;
+}
+.edit-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.btn-ghost { background:#fff; border:1px solid #e6e6e6; padding:8px 12px; border-radius:8px; cursor:pointer; }
+.btn-primary { background:#0d3b66; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+
+/* helper to show menu */
+.preview-item.show-menu .preview-menu { display:block; }
+
+/* Formulaire complet */
+#project-form input, #project-form select, #project-form textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6e6e6;
+  margin-bottom: 12px;
+}
+
+.messages-zone{
+    max-width:700px;
+    margin:0 auto 20px auto;
+}
+
+.alert-message{
+    padding:14px;
+    border-radius:10px;
+    margin-bottom:10px;
+    text-align:center;
+    font-weight:500;
+}
+
+.alert-message.success{
+    background:#e8f8ef;
+    color:#1e7e34;
+}
+
+.alert-message.error{
+    background:#fdecea;
+    color:#c0392b;
+}
+</style>
+
+<div class="project-wrapper">
+    <div class="project-card">
+
+        <h2 id="main-title">Commencez votre projet</h2>
+        {% if messages %}
+        <div class="messages-zone">
+          {% for message in messages %}
+            <div class="alert-message {{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Preview Zone (starts empty) -->
+        <div id="preview-zone" class="preview-zone empty">
+            <div style="color:#999; text-align:center;">
+                <p style="margin:0 0 6px 0;">Téléversez des images, vidéos ou fichiers pour prévisualiser ici.</p>
+                <small>Sélection multiple supportée — les éléments s’ajoutent automatiquement en galerie.</small>
+            </div>
+        </div>
+
+        <!-- Inputs cachés -->
+        <input type="file" id="upload-image" accept="image/*" multiple hidden>
+        <input type="file" id="upload-video" accept="video/*,audio/*" multiple hidden>
+        <input type="file" id="upload-style" accept="image/*" multiple hidden>
+        <input type="file" id="upload-prototype" accept=".pdf,.fig,.xd,.sketch,.zip" multiple hidden>
+        <input type="file" id="upload-3d" accept=".obj,.fbx,.glb,.gltf,.zip" multiple hidden>
+
+        <!-- ACTION CARDS -->
+        <div class="action-cards" id="action-cards">
+            <div class="action-card" data-type="image">
+                <i class="bi bi-images"></i>
+                <span>Image</span>
+            </div>
+            <div class="action-card" data-type="video">
+                <i class="bi bi-camera-video"></i>
+                <span>Vidéos & Audio</span>
+            </div>
+
+            <div class="action-card" data-type="prototype">
+                <i class="bi bi-laptop"></i>
+                <span>Prototype</span>
+            </div>
+            <div class="action-card" data-type="3d">
+                <i class="bi bi-box-seam"></i>
+                <span>Ressources 3D</span>
+            </div>
+        </div>
+
+        <button class="btn-publish" id="btn-publish">Continuer</button>
+
+        <!-- FORMULAIRE COMPLET (initialement caché) -->
+        <!-- FORMULAIRE COMPLET (initialement caché) -->
+        <form id="project-form" style="display:none; margin-top:30px;" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="status" id="project-status" value="published">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+            <input type="text" name="title" id="project-title" placeholder="Titre du projet (obligatoire)">
+            <textarea name="description" id="project-desc" rows="4" placeholder="Description détaillée (obligatoire)"></textarea>
+            <select name="category" id="project-category">
+            <option value="">Sélectionnez une catégorie</option>
+            <option value="design_graphique">Design graphique</option>
+            <option value="dev_web">Développement web</option>
+            <option value="ui_ux">UI/UX</option>
+            </select>
+            <input type="text" name="technologies" id="project-tools" placeholder="Technologies / Outils">
+            <input type="url" name="demo_link" id="project-link" placeholder="Lien de démonstration / GitHub (optionnel)">
+            
+            <!-- Champ caché pour envoyer toutes les images -->
+            <input type="hidden" name="image-data" id="image-data">
+            
+            <div style="display:flex; gap:10px; justify-content:center;">
+
+    <button type="submit" name="action" value="draft" class="btn-ghost">
+        💾 Enregistrer brouillon
+    </button>
+
+    <button type="submit" name="action" value="publish" class="btn-publish">
+        🚀 Publier le projet
+    </button>
+
+</div>
+        </div>
+        </form>
+
+
+    </div>
+</div>
+
+<!-- Edit metadata modal -->
+<div id="edit-modal-bg" class="edit-modal-bg" aria-hidden="true">
+  <div class="edit-modal" role="dialog" aria-modal="true">
+    <h4 style="margin:0 0 10px 0;">Modifier les infos</h4>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="edit-row">
+        <label>Titre</label>
+        <input id="meta-title" type="text" placeholder="Titre (optionnel)">
+      </div>
+      <div class="edit-row">
+        <label>Description</label>
+        <textarea id="meta-desc" rows="3" placeholder="Description (optionnel)"></textarea>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-ghost" id="meta-cancel">Annuler</button>
+        <button class="btn-primary" id="meta-save">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== LOGIQUE FRONT-END ========== */
+
+const inputs = {
+  'image': document.getElementById('upload-image'),
+  'video': document.getElementById('upload-video'),
+  'style': document.getElementById('upload-style'),
+  'prototype': document.getElementById('upload-prototype'),
+  '3d': document.getElementById('upload-3d'),
+};
+
+const previewZone = document.getElementById('preview-zone');
+const mainTitle = document.getElementById('main-title');
+const actionCards = document.getElementById('action-cards');
+const btnPublish = document.getElementById('btn-publish');
+const projectForm = document.getElementById('project-form');
+
+let items = [];
+let uidCounter = 0;
+
+
+/* ================== ACTION CARDS ================== */
+
+document.querySelectorAll('.action-card').forEach(card => {
+  card.addEventListener('click', () => {
+    inputs[card.dataset.type].click();
+  });
+});
+
+
+/* ================== GALLERY ================== */
+
+function renderGallery() {
+
+  previewZone.classList.remove('empty');
+  previewZone.innerHTML = '';
+
+  if (items.length === 0) {
+
+    previewZone.classList.add('empty');
+
+    previewZone.innerHTML = `
+      <div style="color:#999; text-align:center;">
+        <p>Téléversez des fichiers pour voir la prévisualisation.</p>
+      </div>
+    `;
+
+    mainTitle.style.opacity = 1;
+
+    return;
+  }
+
+  mainTitle.style.opacity = 0;
+
+  items.forEach((it, idx) => {
+
+    const wrap = document.createElement('div');
+    wrap.className = 'preview-item';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'preview-thumb';
+
+    if (it.type === 'image') {
+
+      const img = document.createElement('img');
+      img.src = it.url;
+      thumb.appendChild(img);
+
+    } else if (it.type === 'video') {
+
+      const vid = document.createElement('video');
+      vid.src = it.url;
+      vid.controls = true;
+      thumb.appendChild(vid);
+
+    } else {
+
+      const txt = document.createElement('div');
+      txt.innerText = it.file.name;
+      thumb.appendChild(txt);
+
+    }
+
+    wrap.appendChild(thumb);
+
+
+    const meta = document.createElement('div');
+    meta.className = 'preview-meta';
+
+    const title = document.createElement('div');
+    title.className = 'meta-title';
+    title.textContent = it.file.name;
+
+    meta.appendChild(title);
+
+
+    const controls = document.createElement('div');
+    controls.className = 'meta-controls';
+
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'ctrl-btn';
+    upBtn.innerHTML = "↑";
+    upBtn.onclick = () => moveItemUp(idx);
+
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'ctrl-btn';
+    downBtn.innerHTML = "↓";
+    downBtn.onclick = () => moveItemDown(idx);
+
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'ctrl-btn';
+    delBtn.innerHTML = "❌";
+    delBtn.onclick = () => deleteItem(it.id);
+
+
+    controls.appendChild(upBtn);
+    controls.appendChild(downBtn);
+    controls.appendChild(delBtn);
+
+    meta.appendChild(controls);
+
+    wrap.appendChild(meta);
+
+    previewZone.appendChild(wrap);
+
+  });
+
+}
+
+
+/* ================== ADD FILES ================== */
+
+function addFiles(fileList) {
+
+  for (const f of fileList) {
+
+    const type =
+      f.type.startsWith('image/')
+        ? 'image'
+        : f.type.startsWith('video/')
+        ? 'video'
+        : 'file';
+
+    const url = URL.createObjectURL(f);
+
+    items.push({
+      id: uidCounter++,
+      type: type,
+      file: f,
+      url: url
+    });
+
+  }
+
+  renderGallery();
+
+}
+
+
+Object.values(inputs).forEach(inp => {
+
+  inp.addEventListener('change', (e) => {
+    addFiles(e.target.files);
+  });
+
+});
+
+
+/* ================== MOVE ================== */
+
+function moveItemUp(idx) {
+
+  if (idx > 0) {
+
+    [items[idx - 1], items[idx]] =
+    [items[idx], items[idx - 1]];
+
+    renderGallery();
+  }
+
+}
+
+function moveItemDown(idx) {
+
+  if (idx < items.length - 1) {
+
+    [items[idx + 1], items[idx]] =
+    [items[idx], items[idx + 1]];
+
+    renderGallery();
+  }
+
+}
+
+
+/* ================== DELETE ================== */
+
+function deleteItem(id) {
+
+  items = items.filter(it => it.id !== id);
+
+  renderGallery();
+
+}
+
+
+/* ================= FORMULAIRE FINAL ================= */
+
+btnPublish.addEventListener('click', () => {
+
+  if (items.length === 0) {
+
+    alert('Veuillez téléverser au moins un fichier.');
+    return;
+  }
+
+  previewZone.style.display = 'none';
+  actionCards.style.display = 'none';
+  btnPublish.style.display = 'none';
+
+  projectForm.style.display = 'block';
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+
+});
+
+
+/* ================= ENVOI DU FORMULAIRE ================= */
+
+projectForm.addEventListener("submit", function () {
+
+  items.forEach(it => {
+
+    const dt = new DataTransfer();
+    dt.items.add(it.file);
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.name = "images";
+    input.files = dt.files;
+    input.style.display = "none";
+
+    projectForm.appendChild(input);
+
+  });
+
+});
+</script>
+
+{% endblock %}
