@@ -114,7 +114,20 @@
   <div class="infinite-scroll-wrapper" id="scroll-zone">
     <div class="infinite-scroll" id="infinite-container">
       {% for user in prestataires %}
-      <div class="card">
+      <a href="{% url 'profil_utilisateur' user.id_utilisateur %}" class="card">
+        <div class="card-cover">
+          {% if user.preview_images %}
+            <div class="cover-grid cover-grid-{{ user.preview_images|length }}">
+              {% for img in user.preview_images %}
+              <div class="cover-img">
+                <img src="{{ img.image.url }}" alt="Publication de {{ user.username }}">
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="cover-placeholder"></div>
+          {% endif %}
+        </div>
         <div class="card-avatar">
           {% if user.photo_profil %}
             <img src="{{ user.photo_profil.url }}" alt="{{ user.username }}">
@@ -124,8 +137,8 @@
         </div>
         <h3>{{ user.username }}</h3>
         <p>{{ user.get_role_display }}</p>
-        <a href="{% url 'profil_utilisateur' user.id_utilisateur %}" class="btn-orange small">Voir profil</a>
-      </div>
+        <span class="btn-orange small">Voir profil</span>
+      </a>
       {% endfor %}
     </div>
   </div>
@@ -143,7 +156,7 @@
     <div class="infinite-scroll" id="offers-infinite-container">
 
       {% for offer in offers %}
-      <div class="card offre">
+      <a href="{% url 'profil_utilisateur' offer.owner.id_utilisateur %}" class="card offre">
         <h3 class="offer-title">{{ offer.title }}</h3>
 
         <p class="offer-description">
@@ -152,22 +165,29 @@
 
       <!-- Auteur de l'offre (mini avatar) -->
       <div class="offer-owner">
-        <div class="offer-owner-avatar">
-          {% if offer.owner.photo_profil %}
-            <img src="{{ offer.owner.photo_profil.url }}" alt="{{ offer.owner.username }}">
-          {% else %}
-            <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
-          {% endif %}
+        <div class="offer-owner-avatar-wrap">
+          {% for img in offer.owner_preview_images|slice:":2" %}
+          <div class="offer-owner-peek offer-owner-peek-{{ forloop.counter }}">
+            <img src="{{ img.image.url }}" alt="Publication de {{ offer.owner.username }}">
+          </div>
+          {% endfor %}
+          <div class="offer-owner-avatar">
+            {% if offer.owner.photo_profil %}
+              <img src="{{ offer.owner.photo_profil.url }}" alt="{{ offer.owner.username }}">
+            {% else %}
+              <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
+            {% endif %}
+          </div>
         </div>
         <span class="offer-owner-name">{{ offer.owner.username }}</span>
       </div>
 
       <!-- Bouton -->
-      <a href="{% url 'profil_utilisateur' offer.owner.id_utilisateur %}" class="btn-orange small">
+      <span class="btn-orange small">
         Voir le profil
-      </a>
+      </span>
 
-      </div>
+      </a>
       {% endfor %}
 
     </div>
@@ -315,13 +335,65 @@
   box-shadow: 0 12px 25px rgba(0,0,0,0.12);
 }
 
+/* Bandeau d'aperçu des publications, en haut de la carte */
+.card {
+  overflow: hidden;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.card-cover {
+  position: relative;
+  margin: -20px -20px 0 -20px;
+  height: 140px;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #eef1ff, #f6f7fb);
+}
+
+.cover-grid {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+}
+
+.cover-img {
+  flex: 1;
+  overflow: hidden;
+}
+
+.cover-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .cover-img img {
+  transform: scale(1.06);
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #eef1ff, #f6f7fb);
+}
+
 .card-avatar {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 15px;
+  width: 84px;
+  height: 84px;
+  margin: -42px auto 12px;
+  position: relative;
+  z-index: 2;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #f0f0f0;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: #fff;
 }
 
 .card-avatar img {
@@ -379,13 +451,25 @@
   margin-bottom: 12px;
 }
 
+.offer-owner-avatar-wrap {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+}
+
 .offer-owner-avatar {
-  width: 50px;
-  height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #f0f0f0;
-  flex-shrink: 0;
+  z-index: 2;
+  background: #fff;
 }
 
 .offer-owner-avatar img {
@@ -393,6 +477,28 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Aperçu des publications de l'auteur de l'offre */
+.offer-owner-peek {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  z-index: 1;
+}
+
+.offer-owner-peek img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.offer-owner-peek-1 { top: -2px;    left: -2px; }
+.offer-owner-peek-2 { bottom: -2px; right: -2px; }
 
 .offer-owner-name {
   font-size: 0.85rem;

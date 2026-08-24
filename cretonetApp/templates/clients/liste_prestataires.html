@@ -100,6 +100,11 @@
   padding: 25px 20px;
   text-align: center;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .prestataire-card:hover {
@@ -107,13 +112,53 @@
   box-shadow: 0 14px 35px rgba(0,0,0,0.08);
 }
 
-/* ===== AVATAR ===== */
+/* ===== BANDEAU D'APERÇU DES PUBLICATIONS ===== */
+.prestataire-cover {
+  position: relative;
+  margin: -25px -20px 0 -20px;
+  height: 150px;
+  border-radius: 18px 18px 0 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e9ecf5, #f3f3f3);
+}
+
+.cover-grid {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+}
+
+.cover-img {
+  flex: 1;
+  overflow: hidden;
+}
+
+.cover-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.prestataire-card:hover .cover-img img {
+  transform: scale(1.06);
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e9ecf5, #f3f3f3);
+}
+
+/* ===== AVATAR (chevauche le bandeau) ===== */
 .prestataire-avatar {
   position: relative;
-  width: 90px;
-  height: 90px;
-  margin: auto;
-  margin-bottom: 10px;
+  width: 84px;
+  height: 84px;
+  margin: -42px auto 12px;
+  z-index: 2;
 }
 
 .prestataire-avatar img {
@@ -122,17 +167,19 @@
   border-radius: 50%;
   object-fit: cover;
   background: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .online-dot {
   position: absolute;
-  bottom: 5px;
-  right: 5px;
+  bottom: 4px;
+  right: 4px;
   width: 14px;
   height: 14px;
   background: #22c55e;
   border-radius: 50%;
-  border: 3px solid #f3f3f3;
+  border: 3px solid #fff;
 }
 
 /* ===== INFOS ===== */
@@ -214,7 +261,21 @@
     {% if prestataires %}
     <div class="prestataire-grid">
       {% for user in prestataires %}
-      <div class="prestataire-card">
+      <a href="{% url 'profil_utilisateur' user.id_utilisateur %}" class="prestataire-card">
+
+        <div class="prestataire-cover">
+          {% if user.preview_images %}
+            <div class="cover-grid cover-grid-{{ user.preview_images|length }}">
+              {% for img in user.preview_images %}
+              <div class="cover-img">
+                <img src="{{ img.image.url }}" alt="Publication de {{ user.username }}">
+              </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="cover-placeholder"></div>
+          {% endif %}
+        </div>
 
         <div class="prestataire-avatar">
           {% if user.photo_profil %}
@@ -235,11 +296,11 @@
         <p class="prestataire-bio">Aucune description disponible.</p>
         {% endif %}
 
-        <a href="{% url 'profil_utilisateur' user.id_utilisateur %}" class="prestataire-btn">
+        <span class="prestataire-btn">
           Voir le profil →
-        </a>
+        </span>
 
-      </div>
+      </a>
       {% endfor %}
     </div>
     {% else %}

@@ -87,6 +87,7 @@
 
 /* ===== CARTE ===== */
 .offre-card {
+    position: relative;
     background: #f4f4f4;
     border-radius: 24px;
     padding: 26px;
@@ -94,6 +95,21 @@
     flex-direction: column;
     justify-content: space-between;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: pointer;
+}
+
+/* Zone cliquable qui couvre toute la carte -> profil de l'auteur */
+.offre-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 24px;
+}
+
+/* Le bouton "Voir l'offre" reste cliquable au-dessus de la zone profil */
+.offre-btn-top {
+    position: relative;
+    z-index: 2;
 }
 
 .offre-card:hover {
@@ -184,6 +200,69 @@
     transform: translateY(-2px);
 }
 
+/* ===== AUTEUR DE L'OFFRE ===== */
+.offre-owner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.offre-owner-avatar-wrap {
+    position: relative;
+    width: 74px;
+    height: 74px;
+    flex-shrink: 0;
+}
+
+.offre-owner-avatar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #fff;
+    z-index: 2;
+    background: #fff;
+}
+
+.offre-owner-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Aperçu des publications de l'auteur */
+.offre-owner-peek {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    z-index: 1;
+}
+
+.offre-owner-peek img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.offre-owner-peek-1 { top: -2px;    left: -2px; }
+.offre-owner-peek-2 { bottom: -2px; right: -2px; }
+
+.offre-owner-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
 /* ===== VIDE ===== */
 .empty-text {
     text-align: center;
@@ -228,6 +307,9 @@
         <div class="offre-grid">
             {% for offer in offers %}
                 <div class="offre-card">
+                    {% if offer.owner %}
+                    <a href="{% url 'profil_utilisateur' offer.owner.id_utilisateur %}" class="offre-card-link" aria-label="Voir le profil de {{ offer.owner.username }}"></a>
+                    {% endif %}
                     <div>
                         <div class="offre-header">
                             <h3 class="offre-title">{{ offer.title }}</h3>
@@ -261,7 +343,25 @@
                     </div>
 
                     {% if offer.owner %}
-                    <a href="{% url 'offer_detail' offer.pk %}" class="offre-btn">
+                    <div class="offre-owner">
+                        <div class="offre-owner-avatar-wrap">
+                            {% for img in offer.owner_preview_images|slice:":2" %}
+                            <div class="offre-owner-peek offre-owner-peek-{{ forloop.counter }}">
+                                <img src="{{ img.image.url }}" alt="Publication de {{ offer.owner.username }}">
+                            </div>
+                            {% endfor %}
+                            <div class="offre-owner-avatar">
+                                {% if offer.owner.photo_profil %}
+                                    <img src="{{ offer.owner.photo_profil.url }}" alt="{{ offer.owner.username }}">
+                                {% else %}
+                                    <img src="{% static 'images/default-avatar.png' %}" alt="Avatar">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <span class="offre-owner-name">{{ offer.owner.username }}</span>
+                    </div>
+
+                    <a href="{% url 'offer_detail' offer.pk %}" class="offre-btn offre-btn-top">
                         Voir l'offre →
                     </a>
                     {% endif %}

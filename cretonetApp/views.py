@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from .models import (
     Project,
+    ProjectImage,
     Offer,
     Message,
     Utilisateur,
@@ -21,15 +22,27 @@ from django.utils import timezone
 from .models import Utilisateur, Offer
 
 def index(request):
-    prestataires = Utilisateur.objects.filter(
+    prestataires = list(Utilisateur.objects.filter(
         role__in=['designer', 'developpeur']
-    )
+    ))
 
     today = timezone.now().date()
 
-    offers = Offer.objects.filter(
+    offers = list(Offer.objects.filter(
 
-    ).order_by('-created_at')[:6]  # 👈 LIMITATION ICI
+    ).order_by('-created_at')[:6])  # 👈 LIMITATION ICI
+
+    for prestataire in prestataires:
+        prestataire.preview_images = ProjectImage.objects.filter(
+            project__owner=prestataire,
+            project__status='published'
+        ).order_by('-project__created_at')[:3]
+
+    for offer in offers:
+        offer.owner_preview_images = ProjectImage.objects.filter(
+            project__owner=offer.owner,
+            project__status='published'
+        ).order_by('-project__created_at')[:3]
 
     return render(request, 'clients/index.html', {
         'prestataires': prestataires,
@@ -170,6 +183,13 @@ def liste_prestataires(request):
 
     if role:
         prestataires = prestataires.filter(role__iexact=role.lower())  # ignore case
+
+    prestataires = list(prestataires)
+    for prestataire in prestataires:
+        prestataire.preview_images = ProjectImage.objects.filter(
+            project__owner=prestataire,
+            project__status='published'
+        ).order_by('-project__created_at')[:3]
 
     context = {
         'prestataires': prestataires,
@@ -695,7 +715,13 @@ def offers_list(request):
         offers = offers.filter(title__icontains=q)
 
     if category:
-        offers = offers.filter(category=category)  
+        offers = offers.filter(category=category)
+
+    for offer in offers:
+        offer.owner_preview_images = ProjectImage.objects.filter(
+            project__owner=offer.owner,
+            project__status='published'
+        ).order_by('-project__created_at')[:3]
 
     context = {
         'offers': offers,
