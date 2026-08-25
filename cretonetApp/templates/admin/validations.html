@@ -719,7 +719,7 @@ padding:16px;
 
                                 </a>
 
-                                <a href="{% url 'admin_offer_detail' item.id %}"
+                                <a href="{% url 'approve_offer' item.id %}"
                                    class="validation-btn approve">
 
                                     <i class="fas fa-check"></i>
@@ -727,7 +727,7 @@ padding:16px;
 
                                 </a>
 
-                                <a href="{% url 'admin_offer_delete' item.id %}"
+                                <a href="{% url 'reject_offer' item.id %}"
                                    class="validation-btn reject"
                                    onclick="return confirm('Voulez-vous vraiment refuser cette offre ?');">
 
@@ -887,7 +887,7 @@ padding:16px;
 
                                 </a>
 
-                                <a href="{% url 'admin_project_edit' item.id %}"
+                                <a href="{% url 'approve_project' item.id %}"
                                    class="validation-btn approve">
 
                                     <i class="fas fa-check"></i>
@@ -895,7 +895,7 @@ padding:16px;
 
                                 </a>
 
-                                <a href="{% url 'admin_project_delete' item.id %}"
+                                <a href="{% url 'reject_project' item.id %}"
                                    class="validation-btn reject"
                                    onclick="return confirm('Voulez-vous vraiment refuser ce projet ?');">
 

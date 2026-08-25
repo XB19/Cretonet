@@ -1,25 +1,25 @@
 # cretonetApp/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate, logout
+
+from datetime import timedelta
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.decorators import login_required
-from .forms import FormulaireInscription, FormulaireConnexion
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
+from django.http import JsonResponse, HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
+from .ai_moderation import moderer_contenu
+from .decorators import admin_only
+from .forms import FormulaireInscription, FormulaireConnexion, ProjectForm, ProfilForm, OfferForm
+from .models import Project, ProjectImage, Offer, Message, Utilisateur, User, Report
+
+User = get_user_model()
 
 
-from django.db.models import Count
-from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from .models import (
-    Project,
-    ProjectImage,
-    Offer,
-    Message,
-    Utilisateur,
-)
 
-from django.utils import timezone
-from .models import Utilisateur, Offer
 
 def index(request):
     prestataires = list(Utilisateur.objects.filter(
@@ -29,7 +29,7 @@ def index(request):
     today = timezone.now().date()
 
     offers = list(Offer.objects.filter(
-
+        status='available'
     ).order_by('-created_at')[:6])  # 👈 LIMITATION ICI
 
     for prestataire in prestataires:
@@ -53,28 +53,38 @@ def index(request):
 
 
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import FormulaireInscription, FormulaireConnexion
 
 
 ROLE_MAP = {
-    'client': 'recruteur',       
-    'prestataire': 'designer',   
+    'designer': 'designer',
+    'developpeur': 'developpeur',
+    'recruteur': 'recruteur',
+}
+
+# Anciennes valeurs de kind (avant le passage à 3 rôles) : on redirige
+# vers le nouveau choix plutôt que de renvoyer une erreur.
+LEGACY_ROLE_KINDS = {'client', 'prestataire'}
+
+ROLE_LABELS = {
+    'designer': 'Designer',
+    'developpeur': 'Développeur',
+    'recruteur': 'Recruteur',
 }
 
 def choisir_role(request):
-    """Page qui propose : Client / Prestataire"""
+    """Page qui propose : Designer / Développeur / Recruteur"""
     return render(request, 'clients/choisir_role.html')
 
 
 def inscription_role(request, kind):
     """
-    kind : 'client' ou 'prestataire' (slug)
+    kind : 'designer', 'developpeur' ou 'recruteur' (slug)
     Rend le formulaire avec le champ role pré-rempli et caché.
     Après inscription réussie, redirige vers la page de connexion.
     """
     kind = kind.lower()
+    if kind in LEGACY_ROLE_KINDS:
+        return redirect('choisir_role')
     if kind not in ROLE_MAP:
         return redirect('choisir_role')
 
@@ -98,7 +108,7 @@ def inscription_role(request, kind):
     return render(request, 'clients/inscription_role.html', {
         'form': form,
         'kind': kind,
-        'role_label': 'Client' if kind == 'client' else 'Prestataire'
+        'role_label': ROLE_LABELS[role_value]
     })
 
 
@@ -130,8 +140,6 @@ def deconnexion(request):
 
 
 
-from django.shortcuts import render
-from .models import Project
 
 def profil(request):
     user = request.user
@@ -158,12 +166,7 @@ def trouver_offre(request):
     return render(request, 'clients/trouver_offre.html')
 
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
-from django.db.models import Q
 
-User = get_user_model()
 
 
 def liste_prestataires(request):
@@ -203,18 +206,6 @@ def liste_prestataires(request):
 
 
 
-@login_required
-def messagerie(request):
-    # ici tu peux récupérer les messages si tu as un modèle de messages
-    return render(request, 'clients/messagerie.html')
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-
-from .forms import ProjectForm
-from .models import ProjectImage
-from .ai_moderation import moderer_contenu
 
 
 @login_required
@@ -239,28 +230,20 @@ def add_project(request):
             description = form.cleaned_data.get("description")
 
             # MODERATION UNIQUEMENT SI PUBLICATION
+            moderation_rejetee = False
             if action == "publish":
-
                 resultat = moderer_contenu(title, description)
-
-                if resultat == "REJECTED":
-
-                    messages.error(
-                        request,
-                        "Votre publication contient des mots ou contenus interdits. "
-                        "Veuillez modifier votre projet avant de publier."
-                    )
-
-                    return render(
-                        request,
-                        "clients/add_project.html",
-                        {"form": form}
-                    )
+                moderation_rejetee = (resultat == "REJECTED")
 
             # 📦 Création projet
             project = form.save(commit=False)
             project.owner = request.user
-            project.status = "draft" if action == "draft" else "published"
+            if action == "draft":
+                project.status = "draft"
+            elif moderation_rejetee:
+                project.status = "pending"
+            else:
+                project.status = "published"
             project.save()
 
             # 📷 Sauvegarde images
@@ -275,8 +258,14 @@ def add_project(request):
                 messages.info(request, "💾 Brouillon enregistré.")
                 return redirect("add_project")
 
-            # ✅ Succès
-            messages.success(request, "✅ Projet publié avec succès.")
+            if moderation_rejetee:
+                messages.warning(
+                    request,
+                    "Votre publication a été mise en attente de vérification par un administrateur."
+                )
+            else:
+                # ✅ Succès
+                messages.success(request, "✅ Projet publié avec succès.")
             return redirect("profil_utilisateur", user_id=request.user.id_utilisateur)
 
         else:
@@ -288,10 +277,6 @@ def add_project(request):
     return render(request, "clients/add_project.html", {"form": form})
 
 
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-from .models import Project
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def edit_project(request, pk):
@@ -305,6 +290,12 @@ def edit_project(request, pk):
         category = request.POST.get('category')
         status = request.POST.get('status', 'draft')
 
+        # MODERATION : seulement si le projet passe/reste publié
+        if status == 'published':
+            resultat = moderer_contenu(title, description)
+            if resultat == "REJECTED":
+                status = 'pending'
+
         # Mise à jour
         project.title = title
         project.description = description
@@ -317,6 +308,8 @@ def edit_project(request, pk):
             for f in request.FILES.getlist('images'):
                 project.images.create(image=f)
 
+        if status == 'pending':
+            return JsonResponse({'message': "Votre publication a été mise en attente de vérification par un administrateur."})
         return JsonResponse({'message': 'Projet mis à jour !'})
 
     # GET → renvoyer le template avec les données existantes
@@ -340,9 +333,6 @@ def delete_project(request, pk):
     return render(request, 'clients/supprimer_projet.html', {'object': project})
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import ProfilForm  # à créer juste après
 
 
 @login_required
@@ -360,8 +350,6 @@ def modifier_profil(request):
     return render(request, 'clients/modifier_profil.html', {'form': form})
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Project  # ton modèle projet
 
 def project_detail(request, pk):
     projet = get_object_or_404(Project, id=pk)
@@ -436,14 +424,7 @@ def profil_utilisateur(request, user_id):
 
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.contrib import messages
-from .models import Message, Offer
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
 @login_required
 def messagerie(request, user_id=None):
@@ -509,7 +490,6 @@ def messagerie(request, user_id=None):
 
 
 
-from django.db.models import Count
 
 def navbar_context(request):
     if request.user.is_authenticated:
@@ -546,14 +526,7 @@ def messagerie_detail(request, user_id):
     })
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import HttpResponseForbidden
 
-from .forms import OfferForm
-from .models import Offer
-from .ai_moderation import moderer_contenu
 
 @login_required
 def publish_offer(request, offer_id=None):
@@ -577,8 +550,13 @@ def publish_offer(request, offer_id=None):
         # Modération AVANT publication
         decision = moderer_contenu(offer_instance.title, offer_instance.description)
         if decision == "REJECTED":
-            messages.error(request, "Votre offre contient un contenu non autorisé. Veuillez modifier votre texte.")
-            return render(request, 'clients/publish_offer.html', {'form': form, 'offer': offer_instance})
+            offer_instance.status = 'pending'
+            offer_instance.save()
+            messages.warning(
+                request,
+                "Votre publication a été mise en attente de vérification par un administrateur."
+            )
+            return redirect('mon_profil')
 
         offer_instance.status = 'available'
         offer_instance.save()
@@ -617,16 +595,8 @@ def update_offer_status(request, offer_id):
 
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Offer
-from .forms import OfferForm
 
 
-from django.shortcuts import render, get_object_or_404
-from django.utils.http import urlencode
-from .models import Offer
 
 def offer_detail(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
@@ -667,12 +637,19 @@ def edit_offer(request, pk):
             if action == 'draft':
                 offer.status = 'draft'
             else:
-                offer.status = 'available'  # Publier l'offre
+                # MODERATION : l'offre doit passer/rester disponible
+                resultat = moderer_contenu(offer.title, offer.description)
+                offer.status = 'pending' if resultat == "REJECTED" else 'available'
 
             offer.save()  # Sauvegarde avec le statut correct
 
             if offer.status == 'draft':
                 messages.success(request, "Brouillon enregistré avec succès.")
+            elif offer.status == 'pending':
+                messages.warning(
+                    request,
+                    "Votre publication a été mise en attente de vérification par un administrateur."
+                )
             else:
                 messages.success(request, "Offre publiée avec succès.")
 
@@ -701,15 +678,11 @@ def delete_offer(request, pk):
     return render(request, 'clients/delete_offer.html', {'offer': offer})
 
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Offer
-from django.db.models import Q
 
 def offers_list(request):
-    q = request.GET.get('q', '').strip()         
-    category = request.GET.get('category', '').strip()  
-    offers = Offer.objects.all()
+    q = request.GET.get('q', '').strip()
+    category = request.GET.get('category', '').strip()
+    offers = Offer.objects.filter(status='available')
 
     if q:
         offers = offers.filter(title__icontains=q)
@@ -731,8 +704,6 @@ def offers_list(request):
     return render(request, 'clients/liste_offres.html', context)
 
 
-from django.shortcuts import redirect
-from django.urls import reverse
 
 def google_login_with_role(request, role):
     # Sauvegarder le rôle choisi dans la session
@@ -743,28 +714,9 @@ def google_login_with_role(request, role):
 
 
 #admin
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
-from .models import Utilisateur, Project, Offer
-
-# 🔐 Sécurité admin
-def admin_required(view_func):
-    def wrapper(request, *args, **kwargs):
-        if request.user.role != 'admin':
-            raise PermissionDenied
-        return view_func(request, *args, **kwargs)
-    return wrapper
 
 
-from django.db.models import Count
-from cretonetApp.models import Project, Offer, Utilisateur
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .decorators import admin_only
-from .models import Project, Offer, Utilisateur
-from django.db.models import Count
 
 @login_required
 @admin_only
@@ -806,11 +758,9 @@ def admin_dashboard(request):
 
 
 
-from django.contrib.auth import get_user_model
-User = get_user_model()
 
 @login_required
-@admin_required
+@admin_only
 def admin_users(request):
     users = User.objects.all()
     return render(request, 'admin/users.html', {'users': users})
@@ -820,15 +770,11 @@ def admin_users(request):
 
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import User  # Ton modèle User personnalisé si tu l’as
 
 # Liste des utilisateurs
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from .models import User
 
+@login_required
+@admin_only
 def admin_user_list(request):
     user_list = User.objects.all().order_by('-date_inscription')
     paginator = Paginator(user_list, 10)  # 10 utilisateurs par page
@@ -847,6 +793,8 @@ def admin_user_list(request):
 
 
 # Ajouter un utilisateur
+@login_required
+@admin_only
 def admin_user_add(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -859,11 +807,15 @@ def admin_user_add(request):
     return render(request, 'admin/users_add.html')
 
 # Voir un utilisateur
+@login_required
+@admin_only
 def admin_user_detail(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     return render(request, 'admin/users_detail.html', {'user': user})
 
 # Modifier un utilisateur
+@login_required
+@admin_only
 def admin_user_edit(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     if request.method == "POST":
@@ -875,18 +827,17 @@ def admin_user_edit(request, user_id):
     return render(request, 'admin/users_edit.html', {'user': user})
 
 # Supprimer un utilisateur
+@login_required
+@admin_only
 def admin_user_delete(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     user.delete()
     messages.success(request, "Utilisateur supprimé !")
     return redirect('admin_user_list')
 
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from .models import Project, User
 
 @login_required
+@admin_only
 def admin_project_list(request):
     projects = Project.objects.all().order_by('-created_at')  # Les plus récents en premier
     paginator = Paginator(projects, 10)  # 10 projets par page
@@ -901,6 +852,7 @@ def admin_project_list(request):
 
 
 @login_required
+@admin_only
 def admin_project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)
     return render(request, 'admin/project_detail.html', {
@@ -908,6 +860,7 @@ def admin_project_detail(request, pk):
     })
 
 @login_required
+@admin_only
 def admin_project_add(request):
     if request.method == 'POST':
         Project.objects.create(
@@ -925,13 +878,10 @@ def admin_project_add(request):
         'mode': 'add'
     })
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Project
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
 
+@login_required
+@admin_only
 def admin_project_edit(request, pk):
     # Récupérer le projet ou renvoyer 404
     project = get_object_or_404(Project, pk=pk)
@@ -982,6 +932,7 @@ def admin_project_edit(request, pk):
 
 
 @login_required
+@admin_only
 def admin_project_delete(request, pk):
     project = get_object_or_404(Project, pk=pk)
 
@@ -994,15 +945,11 @@ def admin_project_delete(request, pk):
     })
 
 
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Offer
-from django.contrib.auth.decorators import login_required
 
 
 # Liste des offres avec pagination
 @login_required
-
+@admin_only
 def admin_offer_list(request):
     offers_list = Offer.objects.all().order_by('-created_at')
     paginator = Paginator(offers_list, 10)  # 10 offres par page
@@ -1012,14 +959,14 @@ def admin_offer_list(request):
 
 # Détail d'une offre
 @login_required
-
+@admin_only
 def admin_offer_detail(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
     return render(request, 'admin/offer_detail.html', {'offer': offer})
 
 # Supprimer une offre
 @login_required
-
+@admin_only
 def admin_offer_delete(request, pk):
     offer = get_object_or_404(Offer, pk=pk)
     if request.method == "POST":
@@ -1135,7 +1082,7 @@ def approve_offer(request, pk):
         pk=pk
     )
 
-    offer.status = 'approved'
+    offer.status = 'available'
     offer.save()
 
     messages.success(
@@ -1176,7 +1123,7 @@ def approve_project(request, pk):
         pk=pk
     )
 
-    project.status = 'approved'
+    project.status = 'published'
     project.save()
 
     messages.success(
@@ -1207,7 +1154,6 @@ def reject_project(request, pk):
     return redirect('admin_validation_list')
 
 
-from .models import Report
 # ==========================
 # ADMIN SIGNALEMENTS
 # ==========================
@@ -1234,17 +1180,11 @@ def admin_report_list(request):
 # ADMIN MESSAGES
 # ==========================
 
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.utils import timezone
-from datetime import timedelta
 
-from .models import Message
 
 
 @login_required
-@admin_required
+@admin_only
 def admin_message_list(request):
 
     messages_qs = Message.objects.select_related(
@@ -1370,14 +1310,14 @@ def admin_settings(request):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Message
 
 
+@login_required
+@admin_only
 def admin_message_detail(request, id):
 
     message = get_object_or_404(Message, id=id)
-    
+
 
     return render(
         request,
@@ -1388,6 +1328,8 @@ def admin_message_detail(request, id):
     )
 
 
+@login_required
+@admin_only
 def admin_delete_message(request, id):
 
     message = get_object_or_404(Message, id=id)
@@ -1399,10 +1341,6 @@ def admin_delete_message(request, id):
 
 
 
-from django.shortcuts import get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Project, Offer, Report
 
 
 @login_required
@@ -1471,17 +1409,23 @@ def create_report(request):
 
 
 
+@login_required
+@admin_only
 def admin_report_detail(request, id):
     report = get_object_or_404(Report, id=id)
     return render(request, "admin/report_detail.html", {"report": report})
 
 
+@login_required
+@admin_only
 def resolve_report(request, id):
     report = get_object_or_404(Report, id=id)
     report.resolved = True
     report.save()
     return redirect('admin_report_list')
 
+@login_required
+@admin_only
 def delete_report(request, id):
     report = get_object_or_404(Report, id=id)
     report.delete()

@@ -201,7 +201,7 @@
 <!-- ===== Section Call To Action ===== -->
 <section class="cta">
   <p>Publiez votre premier portfolio ou votre première offre dès aujourd’hui。</p>
-  <a href="#" class="btn-orange">Rejoignez la communauté</a>
+  <a href="{% url 'choisir_role' %}" class="btn-orange">Rejoignez la communauté</a>
 </section>
 
 <style>
@@ -510,12 +510,26 @@
 </style>
 
 <script>
-// ===== Infinite Scroll Talents =====
-const container = document.getElementById("infinite-container");
-const wrapper = document.getElementById("scroll-zone");
+// L'animation CSS "scroll-left" translate le conteneur de -50% : pour que la
+// boucle soit invisible, le conteneur doit contenir un nombre PAIR de copies
+// du contenu original, et être au moins 2x plus large que la zone visible
+// (sinon, s'il y a peu de cartes, un espace vide apparaît à droite).
+function setupInfiniteScroll(containerId, wrapperId) {
+    const container = document.getElementById(containerId);
+    const wrapper = document.getElementById(wrapperId);
+    if (!container || !wrapper) return;
 
-if (container && wrapper) {
-    container.innerHTML += container.innerHTML;
+    const original = container.innerHTML.trim();
+    if (!original) return;
+
+    let copies = 1;
+    while (container.scrollWidth < wrapper.clientWidth * 2 && copies < 20) {
+        container.innerHTML += original;
+        copies++;
+    }
+    if (copies % 2 !== 0) {
+        container.innerHTML += original;
+    }
 
     wrapper.addEventListener("mouseenter", () => {
         container.style.animationPlayState = "paused";
@@ -526,21 +540,8 @@ if (container && wrapper) {
     });
 }
 
-// ===== Infinite Scroll Offres =====
-const offersContainer = document.getElementById("offers-infinite-container");
-const offersWrapper = document.getElementById("offers-scroll-zone");
-
-if (offersContainer && offersWrapper) {
-    offersContainer.innerHTML += offersContainer.innerHTML;
-
-    offersWrapper.addEventListener("mouseenter", () => {
-        offersContainer.style.animationPlayState = "paused";
-    });
-
-    offersWrapper.addEventListener("mouseleave", () => {
-        offersContainer.style.animationPlayState = "running";
-    });
-}
+setupInfiniteScroll("infinite-container", "scroll-zone");
+setupInfiniteScroll("offers-infinite-container", "offers-scroll-zone");
 </script>
 
 

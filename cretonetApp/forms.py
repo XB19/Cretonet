@@ -8,12 +8,12 @@ class FormulaireInscription(UserCreationForm):
     email = forms.EmailField(label="Email", required=True)
    
     role = forms.ChoiceField(label="Rôle", choices=Utilisateur.ROLES)
-    téléphone = forms.CharField(label="Téléphone", required=False)
+    telephone = forms.CharField(label="Téléphone", required=False)
     adresse = forms.CharField(label="Adresse", required=False)
 
     class Meta:
         model = Utilisateur
-        fields = ['username', 'email', 'role', 'téléphone', 'adresse', 'password1', 'password2']
+        fields = ['username', 'email', 'role', 'telephone', 'adresse', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         """
@@ -45,23 +45,6 @@ class FormulaireConnexion(AuthenticationForm):
         'class': 'form-control',
         'placeholder': 'Mot de passe'
     }))
-
-
-from django import forms
-from .models import Project, ProjectImage
-
-# --- Formulaire principal du projet ---
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['title', 'description', 'category', 'technologies', 'demo_link']
-        widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'Titre du projet', 'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'placeholder': 'Description détaillée', 'class': 'form-control', 'rows': 5}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'technologies': forms.TextInput(attrs={'placeholder': 'Technologies ou outils utilisés', 'class': 'form-control'}),
-            'demo_link': forms.URLInput(attrs={'placeholder': 'Lien de démo / GitHub (optionnel)', 'class': 'form-control'}),
-        }
 
 
 from django import forms

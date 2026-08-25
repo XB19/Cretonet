@@ -9,24 +9,35 @@
   <p>Choisissez votre rôle sur la plateforme</p>
 
   <div style="display:flex;gap:24px;justify-content:center;margin-top:30px;flex-wrap:wrap;">
-    <!-- Client -->
-    <a href="{% url 'inscription_role' kind='client' %}" style="width:360px;text-decoration:none;">
+    <!-- Designer -->
+    <a href="{% url 'inscription_role' kind='designer' %}" style="width:360px;text-decoration:none;">
       <div style="padding:28px;border-radius:12px;border:1px solid #eee;background:#fff;text-align:left;">
-        <h3>Je suis Client</h3>
-        <p>Je recherche un prestataire pour mon projet.</p>
+        <h3>Je suis Designer</h3>
+        <p>Je propose mes services de design (graphisme, UI/UX, etc.).</p>
         <div style="margin-top:14px;">
-          <button class="btn-orange">S'inscrire comme Client</button>
+          <button class="btn-orange">S'inscrire comme Designer</button>
         </div>
       </div>
     </a>
 
-    <!-- Prestataire / Designer -->
-    <a href="{% url 'inscription_role' kind='prestataire' %}" style="width:360px;text-decoration:none;">
+    <!-- Développeur -->
+    <a href="{% url 'inscription_role' kind='developpeur' %}" style="width:360px;text-decoration:none;">
       <div style="padding:28px;border-radius:12px;border:1px solid #eee;background:#fff;text-align:left;">
-        <h3>Je suis Prestataire</h3>
-        <p>Je propose mes services (design, développement, etc.).</p>
+        <h3>Je suis Développeur</h3>
+        <p>Je propose mes services de développement (web, mobile, etc.).</p>
         <div style="margin-top:14px;">
-          <button class="btn-orange">S'inscrire comme Prestataire</button>
+          <button class="btn-orange">S'inscrire comme Développeur</button>
+        </div>
+      </div>
+    </a>
+
+    <!-- Recruteur / Client -->
+    <a href="{% url 'inscription_role' kind='recruteur' %}" style="width:360px;text-decoration:none;">
+      <div style="padding:28px;border-radius:12px;border:1px solid #eee;background:#fff;text-align:left;">
+        <h3>Je suis Recruteur</h3>
+        <p>Je recherche un prestataire pour mon projet.</p>
+        <div style="margin-top:14px;">
+          <button class="btn-orange">S'inscrire comme Recruteur</button>
         </div>
       </div>
     </a>

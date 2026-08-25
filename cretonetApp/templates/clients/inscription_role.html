@@ -90,6 +90,46 @@
 .auth-link a:hover {
   text-decoration: underline;
 }
+
+/* --- Social login buttons --- */
+.social-login {
+  margin-top: 25px;
+}
+.social-login p {
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+.social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.social-btn {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #333;
+  transition: all 0.3s ease;
+}
+.social-btn img {
+  width: 20px;
+  height: 20px;
+}
+.social-btn:hover {
+  background: #fafafa;
+  border-color: #ccc;
+}
 </style>
 
 <section class="auth-section">
@@ -129,6 +169,18 @@
 
       <button type="submit" class="btn-submit">S’inscrire</button>
     </form>
+
+    <!-- Section Inscription via Google -->
+    <div class="social-login">
+      <p>Ou inscrivez-vous avec Google en tant que {{ role_label }}</p>
+
+      <div class="social-buttons">
+        <a href="{% url 'google_login_role' kind %}" class="social-btn">
+          <img src="{% static 'frontend/icons/google-icon.png' %}" alt="Google">
+          Continuer avec Google
+        </a>
+      </div>
+    </div>
 
     <p class="auth-link">Déjà un compte ? <a href="{% url 'connexion' %}">Se connecter</a></p>
   </div>

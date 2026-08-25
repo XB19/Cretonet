@@ -158,10 +158,16 @@
       Recruteur
     </a>
 
-    <!-- Prestataire (Designer / Développeur) -->
-    <a href="{% url 'google_login_role' 'prestataire' %}" class="social-btn">
+    <!-- Designer -->
+    <a href="{% url 'google_login_role' 'designer' %}" class="social-btn">
       <img src="{% static 'frontend/icons/google-icon.png' %}" alt="Google">
-      Prestataire
+      Designer
+    </a>
+
+    <!-- Développeur -->
+    <a href="{% url 'google_login_role' 'developpeur' %}" class="social-btn">
+      <img src="{% static 'frontend/icons/google-icon.png' %}" alt="Google">
+      Développeur
     </a>
 
   </div>
@@ -171,8 +177,9 @@
 
     <p class="auth-link">
       Pas encore de compte ?<br>
-      <a href="{% url 'inscription_role' 'client' %}">S’inscrire en tant que client</a> |
-      <a href="{% url 'inscription_role' 'prestataire' %}">S’inscrire en tant que prestataire</a>
+      <a href="{% url 'inscription_role' 'designer' %}">S’inscrire en tant que designer</a> |
+      <a href="{% url 'inscription_role' 'developpeur' %}">S’inscrire en tant que développeur</a> |
+      <a href="{% url 'inscription_role' 'recruteur' %}">S’inscrire en tant que recruteur</a>
     </p>
   </div>
 </section>

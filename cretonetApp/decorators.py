@@ -7,6 +7,6 @@ def admin_only(view_func):
         if not request.user.is_authenticated:
             return redirect('connexion')
         if request.user.role != 'admin':
-            return redirect('accueil')  # ou page 403
+            return redirect('home')  # ou page 403
         return view_func(request, *args, **kwargs)
     return wrapper
